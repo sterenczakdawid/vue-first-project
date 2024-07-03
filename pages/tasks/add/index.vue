@@ -1,5 +1,8 @@
 <template>
-  <div>Apps</div>
+  <div>
+    <div>Add new task</div>
+    <NuxtLink to="/tasks">Powrót</NuxtLink>
+  </div>
 </template>
 
 <script>
