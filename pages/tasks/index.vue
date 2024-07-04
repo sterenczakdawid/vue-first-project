@@ -10,17 +10,32 @@
     <button>
       <NuxtLink to="tasks/add">Add new task</NuxtLink>
     </button>
+    <v-data-table
+      :headers="headers"
+      :items="servers"
+      :items-per-page="5"
+      class="elevation-24"
+      :loading="loading"
+    ></v-data-table>
   </div>
 </template>
 
 <script>
 export default {
+  data() {
+    return {
+      loading: false,
+    };
+  },
   computed: {
     servers() {
-      return this.$store.getters["servers/servers"];
+      return this.$store.getters["modules/servers/servers"];
     },
     hasServers() {
-      return this.$store.getters["servers/hasServers"];
+      return this.$store.getters["modules/servers/hasServers"];
+    },
+    headers() {
+      return this.$store.getters["modules/servers/headers"];
     },
   },
 };
