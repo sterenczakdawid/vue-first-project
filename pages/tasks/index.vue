@@ -1,22 +1,59 @@
 <template>
-  <div>
+  <div class="container">
     <div>Tasks</div>
-    <ul v-if="hasServers">
-      <li v-for="server in servers" :key="server.id">
-        {{ server.name }}
-      </li>
-    </ul>
-    <h2 v-else>nie ma</h2>
-    <button>
-      <NuxtLink to="tasks/add">Add new task</NuxtLink>
-    </button>
     <v-data-table
       :headers="headers"
       :items="servers"
       :items-per-page="5"
       class="elevation-24"
       :loading="loading"
+      v-if="hasServers"
     ></v-data-table>
+    <h2 v-else>Nie ma danych</h2>
+    <v-dialog max-width="600px" v-model="dialog">
+      <template v-slot:activator="{ on }">
+        <v-btn text v-on="on">Dodaj</v-btn>
+      </template>
+      <v-card>
+        <v-card-title>
+          <h2>Dodawanie</h2>
+        </v-card-title>
+        <v-card-text>
+          <v-form class="px-3" ref="form">
+            <v-text-field
+              label="Name"
+              v-model="name"
+              :rules="inputRules"
+            ></v-text-field>
+            <v-menu>
+              <template v-slot:activator="{ on }">
+                <v-text-field
+                  :value="created"
+                  v-on="on"
+                  label="Created"
+                  prepend-icon="mdi-calendar"
+                  :rules="[(v) => !!v || 'Pole wymagane']"
+                ></v-text-field>
+              </template>
+              <v-date-picker v-model="created"></v-date-picker>
+            </v-menu>
+            <v-menu>
+              <template v-slot:activator="{ on }">
+                <v-text-field
+                  :value="edited"
+                  v-on="on"
+                  label="Edited"
+                  prepend-icon="mdi-calendar"
+                  :rules="[(v) => !!v || 'Pole wymagane']"
+                ></v-text-field>
+              </template>
+              <v-date-picker v-model="edited"></v-date-picker>
+            </v-menu>
+            <v-btn class="success mx-0 mt-3" @click="submit">Dodaj</v-btn>
+          </v-form>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -24,8 +61,34 @@
 export default {
   data() {
     return {
+      name: "",
+      created: null,
+      edited: null,
+      inputRules: [(v) => v.length >= 3 || "Minimalna długość to 3 znaki"],
+      dialog: false,
       loading: false,
     };
+  },
+  methods: {
+    submit() {
+      if (this.$refs.form.validate()) {
+        const formData = {
+          name: this.name,
+          created: this.created,
+          edited: this.edited,
+        };
+
+        console.log(formData);
+        // Dodanie serwera do Vuex store
+        this.$store.dispatch("modules/servers/addServer", formData);
+
+        // Zamknięcie dialogu i zresetowanie formularza
+        this.dialog = false;
+        this.name = "";
+        this.created = null;
+        this.edited = null;
+      }
+    },
   },
   computed: {
     servers() {

@@ -1,0 +1,23 @@
+[
+  {
+    "id": 1,
+    "name": "Application A1",
+    "creationDate": "2023-06-20T09:00:00Z",
+    "modificationDate": "2024-06-30T11:20:00Z",
+    "taskIds": [1, 2]
+  },
+  {
+    "id": 2,
+    "name": "Application A2",
+    "creationDate": "2023-07-10T11:00:00Z",
+    "modificationDate": "2024-07-03T10:00:00Z",
+    "taskIds": [3, 4]
+  },
+  {
+    "id": 3,
+    "name": "Application B1",
+    "creationDate": "2023-06-25T08:00:00Z",
+    "modificationDate": "2024-07-02T12:00:00Z",
+    "taskIds": [5, 6]
+  }
+]

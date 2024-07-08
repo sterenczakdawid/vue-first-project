@@ -1,0 +1,16 @@
+[
+  {
+    "id": 1,
+    "name": "Server A",
+    "created": "2023-06-15T08:30:00Z",
+    "edited": "2024-07-01T12:45:00Z",
+    "applicationIds": [1, 2]
+  },
+  {
+    "id": 2,
+    "name": "Server B",
+    "created": "2023-06-18T07:45:00Z",
+    "edited": "2024-07-02T10:50:00Z",
+    "applicationIds": [3]
+  }
+]

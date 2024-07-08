@@ -137,12 +137,12 @@ export default {
         {
           icon: "mdi-server",
           title: "Servers",
-          to: "/",
+          to: "/servers",
         },
         {
           icon: "mdi-application-outline",
           title: "Applications",
-          to: "/inspire",
+          to: "/apps",
         },
         {
           icon: "mdi-file-tree",
