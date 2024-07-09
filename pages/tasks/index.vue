@@ -5,12 +5,13 @@
       :headers="headers"
       :items="servers"
       :items-per-page="5"
-      class="elevation-24"
+      class="row-pointer"
       :loading="loading"
       v-if="hasServers"
+      @click:row="handleClick"
     ></v-data-table>
     <h2 v-else>Nie ma danych</h2>
-    <v-dialog max-width="600px" v-model="dialog">
+    <v-dialog max-width="700px" v-model="dialog">
       <template v-slot:activator="{ on }">
         <v-btn text v-on="on">Dodaj</v-btn>
       </template>
@@ -89,6 +90,10 @@ export default {
         this.edited = null;
       }
     },
+    handleClick(item) {
+      console.log(item.id);
+      this.$router.push("/tasks/" + item.id);
+    },
   },
   computed: {
     servers() {
@@ -104,4 +109,8 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="css" scoped>
+.row-pointer >>> tbody tr :hover {
+  cursor: pointer;
+}
+</style>
