@@ -14,7 +14,9 @@
     </v-navigation-drawer>
     <v-app-bar app>
       <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
-      <!-- <v-toolbar-title>Application</v-toolbar-title> -->
+      <NuxtLink to="/" class="text-decoration-none white--text pa-5">
+        <v-toolbar-title>Application</v-toolbar-title>
+      </NuxtLink>
     </v-app-bar>
   </div>
 </template>
