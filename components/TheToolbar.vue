@@ -26,6 +26,11 @@ export default {
       drawer: false,
       items: [
         {
+          icon: "mdi-home",
+          title: "Home Page",
+          to: "/",
+        },
+        {
           icon: "mdi-server",
           title: "Servers",
           to: "/servers",
