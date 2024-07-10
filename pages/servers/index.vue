@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <div>Tasks</div>
+    <h2>Servers</h2>
     <v-data-table
       :headers="headers"
       :items="servers"
@@ -20,38 +20,10 @@
           <h2>Dodawanie</h2>
         </v-card-title>
         <v-card-text>
-          <v-form class="px-3" ref="form">
-            <v-text-field
-              label="Name"
-              v-model="name"
-              :rules="inputRules"
-            ></v-text-field>
-            <v-menu>
-              <template v-slot:activator="{ on }">
-                <v-text-field
-                  :value="created"
-                  v-on="on"
-                  label="Created"
-                  prepend-icon="mdi-calendar"
-                  :rules="[(v) => !!v || 'Pole wymagane']"
-                ></v-text-field>
-              </template>
-              <v-date-picker v-model="created"></v-date-picker>
-            </v-menu>
-            <v-menu>
-              <template v-slot:activator="{ on }">
-                <v-text-field
-                  :value="edited"
-                  v-on="on"
-                  label="Edited"
-                  prepend-icon="mdi-calendar"
-                  :rules="[(v) => !!v || 'Pole wymagane']"
-                ></v-text-field>
-              </template>
-              <v-date-picker v-model="edited"></v-date-picker>
-            </v-menu>
-            <v-btn class="success mx-0 mt-3" @click="submit">Dodaj</v-btn>
-          </v-form>
+          <add-server-form
+            @save-data="saveData"
+            @update-dialog="updateDialog"
+          />
         </v-card-text>
       </v-card>
     </v-dialog>
@@ -59,40 +31,28 @@
 </template>
 
 <script>
+import AddServerForm from "~/components/servers/AddServerForm.vue";
 export default {
+  components: {
+    AddServerForm,
+  },
   data() {
     return {
-      name: "",
-      created: null,
-      edited: null,
       inputRules: [(v) => v.length >= 3 || "Minimalna długość to 3 znaki"],
       dialog: false,
       loading: false,
     };
   },
   methods: {
-    submit() {
-      if (this.$refs.form.validate()) {
-        const formData = {
-          name: this.name,
-          created: this.created,
-          edited: this.edited,
-        };
-
-        console.log(formData);
-        // Dodanie serwera do Vuex store
-        this.$store.dispatch("modules/servers/addServer", formData);
-
-        // Zamknięcie dialogu i zresetowanie formularza
-        this.dialog = false;
-        this.name = "";
-        this.created = null;
-        this.edited = null;
-      }
-    },
     handleClick(item) {
       console.log(item.id);
       this.$router.push(this.$route.path + "/" + item.id);
+    },
+    saveData(formData) {
+      this.$store.dispatch("modules/servers/addServer", formData);
+    },
+    updateDialog(value) {
+      this.dialog = value;
     },
   },
   computed: {
@@ -103,13 +63,13 @@ export default {
       return this.$store.getters["modules/servers/hasServers"];
     },
     headers() {
-      return this.$store.getters["modules/servers/headers"];
+      return this.$store.getters.getHeaders;
     },
   },
 };
 </script>
 
-<style lang="css" scoped>
+<style lang="css">
 .row-pointer >>> tbody tr :hover {
   cursor: pointer;
 }

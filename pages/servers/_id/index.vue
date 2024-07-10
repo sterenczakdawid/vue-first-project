@@ -1,28 +1,47 @@
 <template>
   <div>
-    <h1>{{ id }}</h1>
-    <p>{{ name }}</p>
-    <!-- <NuxtLink to="./">Powrót</NuxtLink> -->
-    <v-data-table
-      :headers="headers"
-      :items="filteredTasks"
-      :items-per-page="5"
-      class="row-pointer"
-    ></v-data-table>
-    <v-data-table
-      :headers="headers"
-      :items="filteredApps"
-      :items-per-page="5"
-      class="row-pointer"
-    ></v-data-table>
-    <v-btn @click="to">Powrót</v-btn>
+    <!-- <h1>{{ id }}</h1> -->
+    <h2 class="pt-8 pb-4">{{ name }} - details</h2>
+    <p class="grey--text text--lighten-1 ma-0">Created: {{ created }}</p>
+    <p class="grey--text text--lighten-1">Edited: {{ edited }}</p>
+    <v-tabs v-model="tab" centered grow>
+      <v-tab>Applications</v-tab>
+      <v-tab>Tasks</v-tab>
+    </v-tabs>
+    <v-tabs-items v-model="tab">
+      <v-tab-item>
+        <v-data-table
+          :headers="headers"
+          :items="filteredApps"
+          :items-per-page="5"
+          class="row-pointer"
+          @click:row="handleClickApp"
+        ></v-data-table
+      ></v-tab-item>
+      <v-tab-item>
+        <v-data-table
+          :headers="headers"
+          :items="filteredTasks"
+          :items-per-page="5"
+          class="row-pointer"
+          @click:row="handleClick"
+        ></v-data-table
+      ></v-tab-item>
+    </v-tabs-items>
+
+    <back-button />
   </div>
 </template>
 
 <script>
+import BackButton from "~/components/utils/BackButton.vue";
 export default {
+  components: {
+    BackButton,
+  },
   data() {
     return {
+      tab: null,
       selectedServer: null,
       id: this.$route.params.id,
     };
@@ -30,6 +49,12 @@ export default {
   computed: {
     name() {
       return this.selectedServer.name;
+    },
+    created() {
+      return this.selectedServer.created;
+    },
+    edited() {
+      return this.selectedServer.edited;
     },
     tasks() {
       return this.$store.getters["modules/tasks/tasks"];
@@ -44,7 +69,7 @@ export default {
     //   return this.$store.getters["modules/servers/hasServers"];
     // },
     headers() {
-      return this.$store.getters["modules/tasks/headers"];
+      return this.$store.getters.getHeaders;
     },
     filteredApps() {
       if (!this.selectedServer) return [];
@@ -54,8 +79,12 @@ export default {
     },
   },
   methods: {
-    to() {
-      this.$router.back();
+    handleClick(item) {
+      console.log(item.id);
+      this.$router.push("/tasks/" + item.id);
+    },
+    handleClickApp(item) {
+      this.$router.push("/apps/" + item.id);
     },
   },
   created() {
@@ -66,4 +95,8 @@ export default {
 };
 </script>
 
-<style></style>
+<style>
+.row-pointer >>> tbody tr :hover {
+  cursor: pointer;
+}
+</style>

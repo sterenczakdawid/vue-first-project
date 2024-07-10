@@ -5,9 +5,6 @@ export default {
   hasTasks(state) {
     return state.tasks && state.tasks.length > 0;
   },
-  headers(state) {
-    return state.headers;
-  },
   nextId: (state) => {
     const ids = state.tasks.map((task) => parseInt(task.id, 10));
     return ids.length ? Math.max(...ids) + 1 : 1;

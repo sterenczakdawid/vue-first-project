@@ -1,6 +1,13 @@
 export default {
-  addServer({ commit, getters }, server) {
-    server.id = getters.nextId.toString(); // Generowanie nowego ID
-    commit("addServer", server);
+  addServer(context, server) {
+    const serverData = {
+      id: context.getters.nextId,
+      name: server.name,
+      created: server.created,
+      edited: server.edited,
+      tasksIds: server.tasksIds,
+      appsIds: server.appsIds,
+    };
+    context.commit("addServer", serverData);
   },
 };

@@ -3,36 +3,48 @@
     "id": 1,
     "name": "Task A1-1",
     "created": "2023-06-25T10:00:00Z",
-    "edited": "2024-07-01T08:00:00Z"
+    "edited": "2024-07-01T08:00:00Z",
+    "serverId": 1,
+    "appId": 0
   },
   {
     "id": 2,
     "name": "Task A1-2",
     "created": "2023-07-01T14:00:00Z",
-    "edited": "2024-07-02T09:00:00Z"
+    "edited": "2024-07-02T09:00:00Z",
+    "serverId": 1,
+    "appId": 0
   },
   {
     "id": 3,
     "name": "Task A2-1",
     "created": "2023-07-15T09:30:00Z",
-    "edited": "2024-07-04T10:30:00Z"
+    "edited": "2024-07-04T10:30:00Z",
+    "serverId": 2,
+    "appId": 0
   },
   {
     "id": 4,
     "name": "Task A2-2",
     "created": "2023-07-20T13:00:00Z",
-    "edited": "2024-07-05T14:00:00Z"
+    "edited": "2024-07-05T14:00:00Z",
+    "serverId": 1,
+    "appId": 0
   },
   {
     "id": 5,
     "name": "Task B1-1",
     "created": "2023-06-30T10:15:00Z",
-    "edited": "2024-07-03T09:15:00Z"
+    "edited": "2024-07-03T09:15:00Z",
+    "serverId": 2,
+    "appId": 0
   },
   {
     "id": 6,
     "name": "Task B1-2",
     "created": "2023-07-05T12:45:00Z",
-    "edited": "2024-07-04T11:00:00Z"
+    "edited": "2024-07-04T11:00:00Z",
+    "serverId": 1,
+    "appId": 0
   }
 ]

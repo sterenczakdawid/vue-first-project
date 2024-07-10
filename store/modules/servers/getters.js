@@ -5,9 +5,6 @@ export default {
   hasServers(state) {
     return state.servers && state.servers.length > 0;
   },
-  headers(state) {
-    return state.headers;
-  },
   nextId: (state) => {
     const ids = state.servers.map((server) => parseInt(server.id, 10));
     return ids.length ? Math.max(...ids) + 1 : 1;
