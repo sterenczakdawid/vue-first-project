@@ -21,7 +21,7 @@
       item-text="name"
       item-value="id"
     ></v-select>
-    <v-menu>
+    <!-- <v-menu>
       <template v-slot:activator="{ on }">
         <v-text-field
           :value="created"
@@ -32,8 +32,8 @@
         ></v-text-field>
       </template>
       <v-date-picker v-model="created"></v-date-picker>
-    </v-menu>
-    <v-menu>
+    </v-menu> -->
+    <!-- <v-menu>
       <template v-slot:activator="{ on }">
         <v-text-field
           :value="edited"
@@ -44,8 +44,11 @@
         ></v-text-field>
       </template>
       <v-date-picker v-model="edited"></v-date-picker>
-    </v-menu>
-    <v-btn class="success mx-0 mt-3" @click="submit">Dodaj</v-btn>
+    </v-menu> -->
+    <!-- <v-btn type="button" class="mx-0 mt-3" @click="cancel" width="100px"
+      >Cancel</v-btn
+    > -->
+    <v-btn class="success mx-0 mt-3" @click="submit" width="100px">Add</v-btn>
   </v-form>
 </template>
 
@@ -55,8 +58,8 @@ export default {
   data() {
     return {
       name: "",
-      created: null,
-      edited: null,
+      // created: null,
+      // edited: null,
       appsIds: [],
       tasksIds: [],
       inputRules: [(v) => v.length >= 3 || "Minimalna długość to 3 znaki"],
@@ -67,8 +70,8 @@ export default {
       if (this.$refs.form.validate()) {
         const formData = {
           name: this.name,
-          created: this.created,
-          edited: this.edited,
+          created: new Date().toISOString(),
+          edited: new Date().toISOString(),
           tasksIds: this.tasksIds,
           appsIds: this.appsIds,
         };
@@ -81,6 +84,9 @@ export default {
         this.created = null;
         this.edited = null;
       }
+    },
+    cancel() {
+      this.$emit("update-dialog", false);
     },
   },
   computed: {

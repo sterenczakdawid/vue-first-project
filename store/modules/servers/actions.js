@@ -10,4 +10,8 @@ export default {
     };
     context.commit("addServer", serverData);
   },
+  removeServer(context, server) {
+    console.log("removing...");
+    context.commit("removeServer", server);
+  },
 };

@@ -9,6 +9,7 @@ export const state = () => ({
     { text: "Name", value: "name" },
     { text: "Created", value: "created" },
     { text: "Edited", value: "edited" },
+    { text: "Actions", value: "actions", sortable: false },
   ],
 });
 
