@@ -86,20 +86,23 @@ export default {
       console.log("editing " + item.name);
     },
     deleteItem(item) {
-      console.log("deleting " + item.name);
-      this.editedIndex = this.servers.indexOf(item);
+      console.log("deleting " + item.name + item.id);
+      // this.editedIndex = this.servers.indexOf(item);
+      this.editedIndex = item.id;
+      console.log(this.editedIndex);
       this.editedItem = Object.assign({}, item);
       this.dialogDelete = true;
       // this.$store.dispatch("modules/servers/removeServer", item.id);
     },
     deleteItemConfirm() {
+      console.log("actually removing ", this.editedIndex);
       this.$store.dispatch("modules/servers/removeServer", this.editedIndex);
       this.closeDelete();
     },
     closeDelete() {
       this.dialogDelete = false;
       this.$nextTick(() => {
-        // this.editedItem = Object.assign({}, this.defaultItem)
+        this.editedItem = Object.assign({}, this.defaultItem);
         this.editedIndex = -1;
       });
     },
