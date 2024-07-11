@@ -14,4 +14,9 @@ export default {
     console.log("removing...", serverId);
     context.commit("removeServer", serverId);
   },
+  updateServer(context, serverData) {
+    const { index, item } = serverData;
+    console.log("Przekazuje ", { index, item });
+    context.commit("updateServer", { index, item });
+  },
 };

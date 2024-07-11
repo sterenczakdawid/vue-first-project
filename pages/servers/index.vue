@@ -22,13 +22,35 @@
             @confirm-delete="deleteItemConfirm"
             @cancel-delete="closeDelete"
           />
+          <v-dialog v-model="dialogEdit" max-width="500px" persistent>
+            <v-card>
+              <v-card-title class="font-weight-regular">Edit</v-card-title>
+              <v-card-text>
+                <v-container>
+                  <v-text-field
+                    v-model="editedItem.name"
+                    label="Server name"
+                  ></v-text-field>
+                </v-container>
+              </v-card-text>
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn color="blue darken-1" text @click="close">
+                  Cancel
+                </v-btn>
+                <v-btn color="blue darken-1" text @click="save"> Save </v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
         </v-toolbar>
       </template>
       <template v-slot:[`item.actions`]="{ item }">
-        <v-icon small class="mr-2" @click.stop="editItem(item)">
+        <v-icon small class="pa-2 mr-2" @click.stop="editItem(item)">
           mdi-pencil
         </v-icon>
-        <v-icon small @click.stop="deleteItem(item)"> mdi-delete </v-icon>
+        <v-icon small class="pa-2" @click.stop="deleteItem(item)">
+          mdi-delete
+        </v-icon>
       </template>
     </v-data-table>
     <!-- <h2 v-else>Nie ma danych</h2> -->
@@ -38,16 +60,19 @@
 <script>
 import ServerFormDialog from "~/components/servers/ServerFormDialog.vue";
 import DeleteDialog from "~/components/servers/DeleteDialog.vue";
+import EditDialog from "~/components/servers/EditDialog.vue";
 export default {
   components: {
     ServerFormDialog,
     DeleteDialog,
+    EditDialog,
   },
   data() {
     return {
       dialog: false,
       loading: false,
       dialogDelete: false,
+      dialogEdit: false,
       editedIndex: -1,
       editedItem: {
         name: "",
@@ -84,15 +109,17 @@ export default {
     },
     editItem(item) {
       console.log("editing " + item.name);
+      this.editedIndex = this.servers.indexOf(item);
+      this.editedItem = Object.assign({}, item);
+      this.editedItem.edited = new Date();
+      this.dialogEdit = true;
     },
     deleteItem(item) {
-      console.log("deleting " + item.name + item.id);
       // this.editedIndex = this.servers.indexOf(item);
       this.editedIndex = item.id;
       console.log(this.editedIndex);
       this.editedItem = Object.assign({}, item);
       this.dialogDelete = true;
-      // this.$store.dispatch("modules/servers/removeServer", item.id);
     },
     deleteItemConfirm() {
       console.log("actually removing ", this.editedIndex);
@@ -105,6 +132,28 @@ export default {
         this.editedItem = Object.assign({}, this.defaultItem);
         this.editedIndex = -1;
       });
+    },
+    close() {
+      this.dialogEdit = false;
+      this.$nextTick(() => {
+        this.editedItem = Object.assign({}, this.defaultItem);
+        this.editedIndex = -1;
+      });
+    },
+    save() {
+      if (this.editedIndex > -1) {
+        // Object.assign(this.servers[this.editedIndex], this.editedItem);
+        console.log("edited: ", this.editedItem);
+        this.$store.dispatch("modules/servers/updateServer", {
+          index: this.editedIndex,
+          item: this.editedItem,
+        });
+      }
+      this.dialogEdit = false;
+      // else {
+      //   this.servers.push(this.editedItem);
+      // }
+      // this.close();
     },
   },
   computed: {
