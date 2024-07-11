@@ -21,33 +21,6 @@
       item-text="name"
       item-value="id"
     ></v-select>
-    <!-- <v-menu>
-      <template v-slot:activator="{ on }">
-        <v-text-field
-          :value="created"
-          v-on="on"
-          label="Created"
-          prepend-icon="mdi-calendar"
-          :rules="[(v) => !!v || 'Pole wymagane']"
-        ></v-text-field>
-      </template>
-      <v-date-picker v-model="created"></v-date-picker>
-    </v-menu> -->
-    <!-- <v-menu>
-      <template v-slot:activator="{ on }">
-        <v-text-field
-          :value="edited"
-          v-on="on"
-          label="Edited"
-          prepend-icon="mdi-calendar"
-          :rules="[(v) => !!v || 'Pole wymagane']"
-        ></v-text-field>
-      </template>
-      <v-date-picker v-model="edited"></v-date-picker>
-    </v-menu> -->
-    <!-- <v-btn type="button" class="mx-0 mt-3" @click="cancel" width="100px"
-      >Cancel</v-btn
-    > -->
     <v-btn class="success mx-0 mt-3" @click="submit" width="100px">Add</v-btn>
   </v-form>
 </template>
@@ -58,11 +31,18 @@ export default {
   data() {
     return {
       name: "",
-      // created: null,
-      // edited: null,
       appsIds: [],
       tasksIds: [],
       inputRules: [(v) => v.length >= 3 || "Minimalna długość to 3 znaki"],
+      options: {
+        // weekday: "short",
+        day: "numeric",
+        month: "numeric",
+        year: "numeric",
+        hour: "numeric",
+        minute: "numeric",
+        second: "numeric",
+      },
     };
   },
   methods: {
@@ -70,8 +50,9 @@ export default {
       if (this.$refs.form.validate()) {
         const formData = {
           name: this.name,
-          created: new Date().toISOString(),
-          edited: new Date().toISOString(),
+          created: new Date().toLocaleString("en-US", this.options),
+          // edited: new Date().toLocaleString("en-GB", this.options),
+          edited: new Date().toISOString().split("T")[0],
           tasksIds: this.tasksIds,
           appsIds: this.appsIds,
         };

@@ -1,8 +1,8 @@
 <template>
   <v-dialog max-width="700px" v-model="isOpen" persistent>
-    <!-- <template v-slot:activator="{ on }">
-      <v-btn text v-on="on">Dodaj</v-btn>
-    </template> -->
+    <template v-slot:activator="{ on }">
+      <v-btn color="primary" v-on="on">Add new server</v-btn>
+    </template>
     <v-card>
       <v-card-title>
         <h2>Dodawanie</h2>

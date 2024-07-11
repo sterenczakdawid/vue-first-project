@@ -14,7 +14,14 @@
           <v-toolbar-title>Servers</v-toolbar-title>
           <v-divider class="mx-4" inset vertical></v-divider>
           <v-spacer></v-spacer>
-          <v-btn color="primary" @click="openDialog">Add new server</v-btn>
+          <server-form-dialog v-model="dialog" @save-data="saveData" />
+          <delete-dialog
+            v-model="dialogDelete"
+            :dialog="dialogDelete"
+            :itemName="editedItemName"
+            @confirm-delete="deleteItemConfirm"
+            @cancel-delete="closeDelete"
+          />
         </v-toolbar>
       </template>
       <template v-slot:[`item.actions`]="{ item }">
@@ -25,22 +32,43 @@
       </template>
     </v-data-table>
     <!-- <h2 v-else>Nie ma danych</h2> -->
-
-    <server-form-dialog v-model="dialog" @save-data="saveData" />
   </div>
 </template>
 
 <script>
 import ServerFormDialog from "~/components/servers/ServerFormDialog.vue";
+import DeleteDialog from "~/components/servers/DeleteDialog.vue";
 export default {
   components: {
     ServerFormDialog,
+    DeleteDialog,
   },
   data() {
     return {
       dialog: false,
       loading: false,
+      dialogDelete: false,
+      editedIndex: -1,
+      editedItem: {
+        name: "",
+        created: null,
+        edited: null,
+        tasksIds: [],
+        appsIds: [],
+      },
+      defaultItem: {
+        name: "",
+        created: null,
+        edited: null,
+        tasksIds: [],
+        appsIds: [],
+      },
     };
+  },
+  watch: {
+    deleteDialog(value) {
+      value || this.closeDelete();
+    },
   },
   methods: {
     handleClick(item) {
@@ -54,15 +82,26 @@ export default {
     updateDialog(value) {
       this.dialog = value;
     },
-    openDialog() {
-      this.dialog = true;
-    },
     editItem(item) {
       console.log("editing " + item.name);
     },
     deleteItem(item) {
       console.log("deleting " + item.name);
-      this.$store.dispatch("modules/servers/removeServer", item.id);
+      this.editedIndex = this.servers.indexOf(item);
+      this.editedItem = Object.assign({}, item);
+      this.dialogDelete = true;
+      // this.$store.dispatch("modules/servers/removeServer", item.id);
+    },
+    deleteItemConfirm() {
+      this.$store.dispatch("modules/servers/removeServer", this.editedIndex);
+      this.closeDelete();
+    },
+    closeDelete() {
+      this.dialogDelete = false;
+      this.$nextTick(() => {
+        // this.editedItem = Object.assign({}, this.defaultItem)
+        this.editedIndex = -1;
+      });
     },
   },
   computed: {
@@ -75,12 +114,15 @@ export default {
     headers() {
       return this.$store.getters.getHeaders;
     },
+    editedItemName() {
+      return this.editedItem.name;
+    },
   },
 };
 </script>
 
 <style lang="css">
-.row-pointer >>> tbody tr :hover {
+tr :hover {
   cursor: pointer;
 }
 </style>

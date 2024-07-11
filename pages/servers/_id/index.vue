@@ -4,7 +4,7 @@
     <h2 class="pt-8 pb-4">{{ name }} - details</h2>
     <p class="grey--text text--lighten-1 ma-0">Created: {{ created }}</p>
     <p class="grey--text text--lighten-1">Edited: {{ edited }}</p>
-    <v-tabs v-model="tab" centered grow>
+    <v-tabs v-model="tab" grow>
       <v-tab>Applications</v-tab>
       <v-tab>Tasks</v-tab>
     </v-tabs>
