@@ -3,24 +3,44 @@
     <v-card>
       <v-card-title class="font-weight-regular">Edit</v-card-title>
       <v-card-text>
-        <v-container>
-          <v-text-field
-            v-model="editedItem.name"
-            label="Dessert name"
-          ></v-text-field>
-        </v-container>
+        <server-form
+          :initialData="editedItem"
+          :submitLabel="'Save'"
+          @submit="save"
+        />
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
         <v-btn color="blue darken-1" text @click="close"> Cancel </v-btn>
-        <v-btn color="blue darken-1" text @click="save"> Save </v-btn>
+        <!-- <v-btn color="blue darken-1" text @click="save"> Save </v-btn> -->
       </v-card-actions>
     </v-card>
   </v-dialog>
 </template>
 
 <script>
-export default {};
+import ServerForm from "~/components/servers/ServerForm.vue";
+export default {
+  components: { ServerForm },
+  props: {
+    dialog: {
+      type: Boolean,
+      required: true,
+    },
+    editedItem: {
+      type: Object,
+      required: true,
+    },
+  },
+  methods: {
+    close() {
+      this.$emit("close");
+    },
+    save(data) {
+      this.$emit("save", data);
+    },
+  },
+};
 </script>
 
 <style></style>

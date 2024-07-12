@@ -8,7 +8,7 @@
         <h2>Dodawanie</h2>
       </v-card-title>
       <v-card-text>
-        <add-server-form @save-data="saveData" @update-dialog="closeDialog" />
+        <server-form :submitLabel="'Add'" @submit="saveData" />
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
@@ -19,9 +19,9 @@
 </template>
 
 <script>
-import AddServerForm from "~/components/servers/AddServerForm.vue";
+import ServerForm from "~/components/servers/ServerForm.vue";
 export default {
-  components: { AddServerForm },
+  components: { ServerForm },
   props: {
     value: Boolean,
   },
@@ -36,14 +36,6 @@ export default {
     },
   },
   methods: {
-    // saveData(formData) {
-    //   this.$emit("save-data", formData);
-    //   // this.$store.dispatch("modules/servers/addServer", formData);
-    // },
-    // updateDialog(value) {
-    //   this.$emit("update-dialog", false);
-    //   // this.dialog = value;
-    // },
     saveData(formData) {
       this.$emit("save-data", formData);
       this.isOpen = false;

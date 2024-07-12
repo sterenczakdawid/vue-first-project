@@ -4,44 +4,28 @@
       :headers="headers"
       :items="servers"
       :items-per-page="5"
-      class="row-pointer"
       :loading="loading"
       v-if="hasServers"
       @click:row="handleClick"
     >
       <template v-slot:top>
-        <v-toolbar>
+        <v-toolbar flat>
           <v-toolbar-title>Servers</v-toolbar-title>
           <v-divider class="mx-4" inset vertical></v-divider>
           <v-spacer></v-spacer>
-          <server-form-dialog v-model="dialog" @save-data="saveData" />
+          <add-server-dialog v-model="dialog" @save-data="saveData" />
+          <edit-dialog
+            :dialog.sync="dialogEdit"
+            :editedItem="editedItem"
+            @close="close"
+            @save="save"
+          />
           <delete-dialog
-            v-model="dialogDelete"
-            :dialog="dialogDelete"
+            :dialog.sync="dialogDelete"
             :itemName="editedItemName"
             @confirm-delete="deleteItemConfirm"
             @cancel-delete="closeDelete"
           />
-          <v-dialog v-model="dialogEdit" max-width="500px" persistent>
-            <v-card>
-              <v-card-title class="font-weight-regular">Edit</v-card-title>
-              <v-card-text>
-                <v-container>
-                  <v-text-field
-                    v-model="editedItem.name"
-                    label="Server name"
-                  ></v-text-field>
-                </v-container>
-              </v-card-text>
-              <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn color="blue darken-1" text @click="close">
-                  Cancel
-                </v-btn>
-                <v-btn color="blue darken-1" text @click="save"> Save </v-btn>
-              </v-card-actions>
-            </v-card>
-          </v-dialog>
         </v-toolbar>
       </template>
       <template v-slot:[`item.actions`]="{ item }">
@@ -58,12 +42,12 @@
 </template>
 
 <script>
-import ServerFormDialog from "~/components/servers/ServerFormDialog.vue";
+import AddServerDialog from "~/components/servers/AddServerDialog.vue";
 import DeleteDialog from "~/components/servers/DeleteDialog.vue";
 import EditDialog from "~/components/servers/EditDialog.vue";
 export default {
   components: {
-    ServerFormDialog,
+    AddServerDialog,
     DeleteDialog,
     EditDialog,
   },
@@ -108,7 +92,7 @@ export default {
       this.dialog = value;
     },
     editItem(item) {
-      console.log("editing " + item.name);
+      console.log("editing " + item.name, item.id);
       this.editedIndex = this.servers.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.editedItem.edited = new Date();
@@ -117,12 +101,12 @@ export default {
     deleteItem(item) {
       // this.editedIndex = this.servers.indexOf(item);
       this.editedIndex = item.id;
-      console.log(this.editedIndex);
+      // console.log(this.editedIndex);
       this.editedItem = Object.assign({}, item);
       this.dialogDelete = true;
     },
     deleteItemConfirm() {
-      console.log("actually removing ", this.editedIndex);
+      // console.log("actually removing ", this.editedIndex);
       this.$store.dispatch("modules/servers/removeServer", this.editedIndex);
       this.closeDelete();
     },
@@ -134,26 +118,37 @@ export default {
       });
     },
     close() {
+      // this.editedItem = Object.assign({}, this.defaultItem);
+      // this.editedIndex = -1;
       this.dialogEdit = false;
       this.$nextTick(() => {
         this.editedItem = Object.assign({}, this.defaultItem);
         this.editedIndex = -1;
       });
     },
-    save() {
+    // save() {
+    //   if (this.editedIndex > -1) {
+    //     // Object.assign(this.servers[this.editedIndex], this.editedItem);
+    //     console.log("edited: ", this.editedItem);
+    //     this.$store.dispatch("modules/servers/updateServer", {
+    //       index: this.editedIndex,
+    //       item: this.editedItem,
+    //     });
+    //   }
+    //   this.dialogEdit = false;
+    //   // else {
+    //   //   this.servers.push(this.editedItem);
+    //   // }
+    //   // this.close();
+    // },
+    save(data) {
       if (this.editedIndex > -1) {
-        // Object.assign(this.servers[this.editedIndex], this.editedItem);
-        console.log("edited: ", this.editedItem);
         this.$store.dispatch("modules/servers/updateServer", {
           index: this.editedIndex,
-          item: this.editedItem,
+          item: data,
         });
       }
       this.dialogEdit = false;
-      // else {
-      //   this.servers.push(this.editedItem);
-      // }
-      // this.close();
     },
   },
   computed: {
