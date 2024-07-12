@@ -19,7 +19,7 @@
 </template>
 
 <script>
-import ServerForm from "~/components/servers/ServerForm.vue";
+import ServerForm from "~/components/servers/old/ServerForm.vue";
 export default {
   components: { ServerForm },
   props: {

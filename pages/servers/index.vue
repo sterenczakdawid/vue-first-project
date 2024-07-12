@@ -4,7 +4,6 @@
       :headers="headers"
       :items="servers"
       :items-per-page="5"
-      :loading="loading"
       v-if="hasServers"
       @click:row="handleClick"
     >
@@ -13,13 +12,14 @@
           <v-toolbar-title>Servers</v-toolbar-title>
           <v-divider class="mx-4" inset vertical></v-divider>
           <v-spacer></v-spacer>
-          <add-server-dialog v-model="dialog" @save-data="saveData" />
-          <edit-dialog
-            :dialog.sync="dialogEdit"
-            :editedItem="editedItem"
+          <v-btn @click="openDialog('add')">add</v-btn>
+          <server-form-dialog
+            :dialog.sync="dialog"
             @close="close"
-            @save="save"
-          />
+            @submit="submit"
+            :mode="mode"
+            :editedItem="editedItem"
+          ></server-form-dialog>
           <delete-dialog
             :dialog.sync="dialogDelete"
             :itemName="editedItemName"
@@ -37,26 +37,22 @@
         </v-icon>
       </template>
     </v-data-table>
-    <!-- <h2 v-else>Nie ma danych</h2> -->
   </div>
 </template>
 
 <script>
-import AddServerDialog from "~/components/servers/AddServerDialog.vue";
 import DeleteDialog from "~/components/servers/DeleteDialog.vue";
-import EditDialog from "~/components/servers/EditDialog.vue";
+import ServerFormDialog from "~/components/servers/ServerFormDialog.vue";
 export default {
   components: {
-    AddServerDialog,
     DeleteDialog,
-    EditDialog,
+    ServerFormDialog,
   },
   data() {
     return {
       dialog: false,
-      loading: false,
+      mode: "add",
       dialogDelete: false,
-      dialogEdit: false,
       editedIndex: -1,
       editedItem: {
         name: "",
@@ -75,38 +71,29 @@ export default {
     };
   },
   watch: {
+    dialog(value) {
+      value || this.close();
+    },
     deleteDialog(value) {
       value || this.closeDelete();
     },
   },
   methods: {
     handleClick(item) {
-      // console.log(item.id);
       this.$router.push(this.$route.path + "/" + item.id);
     },
-    saveData(formData) {
-      this.$store.dispatch("modules/servers/addServer", formData);
-      this.dialog = false;
-    },
-    updateDialog(value) {
-      this.dialog = value;
-    },
     editItem(item) {
-      console.log("editing " + item.name, item.id);
+      this.sfmode = "edit";
       this.editedIndex = this.servers.indexOf(item);
       this.editedItem = Object.assign({}, item);
-      this.editedItem.edited = new Date();
-      this.dialogEdit = true;
+      this.dialog = true;
     },
     deleteItem(item) {
-      // this.editedIndex = this.servers.indexOf(item);
       this.editedIndex = item.id;
-      // console.log(this.editedIndex);
       this.editedItem = Object.assign({}, item);
       this.dialogDelete = true;
     },
     deleteItemConfirm() {
-      // console.log("actually removing ", this.editedIndex);
       this.$store.dispatch("modules/servers/removeServer", this.editedIndex);
       this.closeDelete();
     },
@@ -117,38 +104,27 @@ export default {
         this.editedIndex = -1;
       });
     },
-    close() {
-      // this.editedItem = Object.assign({}, this.defaultItem);
-      // this.editedIndex = -1;
-      this.dialogEdit = false;
-      this.$nextTick(() => {
-        this.editedItem = Object.assign({}, this.defaultItem);
-        this.editedIndex = -1;
-      });
-    },
-    // save() {
-    //   if (this.editedIndex > -1) {
-    //     // Object.assign(this.servers[this.editedIndex], this.editedItem);
-    //     console.log("edited: ", this.editedItem);
-    //     this.$store.dispatch("modules/servers/updateServer", {
-    //       index: this.editedIndex,
-    //       item: this.editedItem,
-    //     });
-    //   }
-    //   this.dialogEdit = false;
-    //   // else {
-    //   //   this.servers.push(this.editedItem);
-    //   // }
-    //   // this.close();
-    // },
-    save(data) {
+    submit(data) {
       if (this.editedIndex > -1) {
         this.$store.dispatch("modules/servers/updateServer", {
           index: this.editedIndex,
           item: data,
         });
+      } else {
+        this.$store.dispatch("modules/servers/addServer", data);
       }
-      this.dialogEdit = false;
+      this.dialog = false;
+    },
+    close() {
+      this.dialog = false;
+      this.$nextTick(() => {
+        this.editedItem = Object.assign({}, this.defaultItem);
+        this.editedIndex = -1;
+      });
+    },
+    openDialog(mode) {
+      this.mode = mode;
+      this.dialog = true;
     },
   },
   computed: {

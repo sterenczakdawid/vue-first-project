@@ -19,7 +19,7 @@
 </template>
 
 <script>
-import ServerForm from "~/components/servers/ServerForm.vue";
+import ServerForm from "~/components/servers/old/ServerForm.vue";
 export default {
   components: { ServerForm },
   props: {
@@ -32,6 +32,9 @@ export default {
       required: true,
     },
   },
+  data() {
+    return {};
+  },
   methods: {
     close() {
       this.$emit("close");
@@ -39,6 +42,9 @@ export default {
     save(data) {
       this.$emit("save", data);
     },
+  },
+  beforeUpdate() {
+    console.log(this.editedItem.name);
   },
 };
 </script>
