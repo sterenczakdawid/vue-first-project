@@ -3,12 +3,26 @@
     <v-card>
       <v-card-title class="font-weight-regular">{{ dialogTitle }}</v-card-title>
       <v-card-text>
-        <!-- <div ref="formSlot">
-          <slot></slot>
-        </div> -->
-        <!-- <slot></slot> -->
-        <!-- <slot name="form"></slot> -->
-        <ServerForm ref="serverForm" :initialData="editedItem" />
+        <v-form class="px-3" ref="form">
+          <v-text-field
+            label="Name"
+            v-model.trim="editedItem.name"
+          ></v-text-field>
+          <v-select
+            v-model="editedItem.serverId"
+            :items="servers"
+            label="Server"
+            item-text="name"
+            item-value="id"
+          ></v-select>
+          <v-select
+            v-model="editedItem.appId"
+            :items="apps"
+            label="Application"
+            item-text="name"
+            item-value="id"
+          ></v-select>
+        </v-form>
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
@@ -20,9 +34,7 @@
 </template>
 
 <script>
-import ServerForm from "~/components/servers/ServerForm.vue";
 export default {
-  components: { ServerForm },
   emits: ["submit", "close"],
   props: {
     dialog: { type: Boolean, required: true },
@@ -34,11 +46,9 @@ export default {
       this.$emit("close");
     },
     submit() {
-      const formComponent = this.$refs.serverForm;
-      // const formComponent = this.$slots.form[0].componentInstance;
-      if (formComponent.validate()) {
+      if (this.$refs.form.validate()) {
         const data = {
-          ...formComponent.formData,
+          ...this.editedItem,
           edited: new Date().toLocaleString(),
         };
         if (!this.editedItem.created) {
@@ -52,8 +62,12 @@ export default {
     dialogTitle() {
       return this.mode === "add" ? "Add new item" : "Edit item";
     },
+    servers() {
+      return this.$store.getters["modules/servers/servers"];
+    },
+    apps() {
+      return this.$store.getters["modules/apps/apps"];
+    },
   },
 };
 </script>
-
-<style></style>

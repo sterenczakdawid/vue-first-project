@@ -40,6 +40,7 @@
     <delete-dialog
       :dialog.sync="dialogDelete"
       :itemName="name"
+      :item="this.selectedServer"
       @confirm-delete="deleteItemConfirm"
       @cancel-delete="closeDelete"
     />
@@ -129,14 +130,14 @@ export default {
       this.editedItem = Object.assign({}, this.selectedServer);
       this.dialogEdit = true;
     },
-    editItemSubmit() {
+    editItemSubmit(data) {
       this.$store
         .dispatch("modules/servers/updateServer", {
           index: this.servers.indexOf(this.selectedServer),
-          item: this.editedItem,
+          item: data,
         })
         .then(() => {
-          this.selectedServer = { ...this.editedItem };
+          this.selectedServer = { ...data };
         });
       this.dialogEdit = false;
     },
@@ -152,4 +153,8 @@ export default {
 };
 </script>
 
-<style></style>
+<style>
+tr :hover {
+  cursor: pointer;
+}
+</style>

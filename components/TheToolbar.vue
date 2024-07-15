@@ -2,6 +2,15 @@
   <div>
     <v-navigation-drawer app v-model="drawer" temporary>
       <v-list>
+        <v-list-item :to="home.to" exact
+          ><v-list-item-action>
+            <v-icon>{{ home.icon }}</v-icon>
+          </v-list-item-action>
+          <v-list-item-content>
+            <v-list-item-title>{{ home.title }}</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+        <v-divider class="blue darken-2 pt-1 my-1" />
         <v-list-item v-for="(item, i) in items" :key="i" :to="item.to" exact>
           <v-list-item-action>
             <v-icon>{{ item.icon }}</v-icon>
@@ -26,12 +35,8 @@ export default {
   data() {
     return {
       drawer: false,
+      home: { icon: "mdi-home", title: "Home Page", to: "/" },
       items: [
-        {
-          icon: "mdi-home",
-          title: "Home Page",
-          to: "/",
-        },
         {
           icon: "mdi-server",
           title: "Servers",

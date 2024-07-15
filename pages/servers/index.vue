@@ -21,10 +21,15 @@
             @submit="submit"
             :mode="mode"
             :editedItem="editedItem"
-          ></server-form-dialog>
+          >
+            <!-- <template v-slot:form>
+              <ServerForm ref="serverForm" :initialData="editedItem" />
+            </template> -->
+          </server-form-dialog>
           <delete-dialog
             :dialog.sync="dialogDelete"
             :itemName="editedItemName"
+            :item="editedItem"
             @confirm-delete="deleteItemConfirm"
             @cancel-delete="closeDelete"
           />
@@ -45,10 +50,12 @@
 <script>
 import DeleteDialog from "~/components/servers/DeleteDialog.vue";
 import ServerFormDialog from "~/components/servers/ServerFormDialog.vue";
+import ServerForm from "~/components/servers/ServerForm.vue";
 export default {
   components: {
     DeleteDialog,
     ServerFormDialog,
+    ServerForm,
   },
   data() {
     return {

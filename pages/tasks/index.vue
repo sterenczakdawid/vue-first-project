@@ -11,22 +11,21 @@
           <v-toolbar-title>Tasks</v-toolbar-title>
           <v-divider class="mx-4" inset vertical></v-divider>
           <v-spacer></v-spacer>
-          <v-btn color="primary" @click="openDialog('add')"
-            >add new task</v-btn
-          >
-          <server-form-dialog
+          <v-btn color="primary" @click="openDialog('add')">add new task</v-btn>
+          <task-form-dialog
             :dialog.sync="dialog"
             @close="close"
             @submit="submit"
             :mode="mode"
             :editedItem="editedItem"
-          ></server-form-dialog>
-          <delete-dialog
+          >
+          </task-form-dialog>
+          <!-- <delete-dialog
             :dialog.sync="dialogDelete"
             :itemName="editedItemName"
             @confirm-delete="deleteItemConfirm"
             @cancel-delete="closeDelete"
-          />
+          /> -->
         </v-toolbar>
       </template>
       <template v-slot:[`item.actions`]="{ item }">
@@ -43,11 +42,11 @@
 
 <script>
 import DeleteDialog from "~/components/servers/DeleteDialog.vue";
-import ServerFormDialog from "~/components/servers/ServerFormDialog.vue";
+import TaskFormDialog from "~/components/tasks/TaskFormDialog.vue";
 export default {
   components: {
     DeleteDialog,
-    ServerFormDialog,
+    TaskFormDialog,
   },
   data() {
     return {
@@ -59,15 +58,15 @@ export default {
         name: "",
         created: null,
         edited: null,
-        tasksIds: [],
-        appsIds: [],
+        serverId: -1,
+        appId: -1,
       },
       defaultItem: {
         name: "",
         created: null,
         edited: null,
-        tasksIds: [],
-        appsIds: [],
+        serverId: -1,
+        appId: -1,
       },
     };
   },
@@ -107,12 +106,12 @@ export default {
     },
     submit(data) {
       if (this.editedIndex > -1) {
-        this.$store.dispatch("modules/servers/updateServer", {
+        this.$store.dispatch("modules/tasks/updateTask", {
           index: this.editedIndex,
           item: data,
         });
       } else {
-        this.$store.dispatch("modules/servers/addServer", data);
+        this.$store.dispatch("modules/tasks/addTask", data);
       }
       this.dialog = false;
     },
