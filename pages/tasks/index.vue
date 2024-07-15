@@ -1,9 +1,149 @@
 <template>
-  <h2>tasks</h2>
+  <div class="container">
+    <v-data-table
+      :headers="headers"
+      :items="tasks"
+      :items-per-page="5"
+      @click:row="handleClick"
+    >
+      <template v-slot:top>
+        <v-toolbar flat>
+          <v-toolbar-title>Tasks</v-toolbar-title>
+          <v-divider class="mx-4" inset vertical></v-divider>
+          <v-spacer></v-spacer>
+          <v-btn color="primary" @click="openDialog('add')"
+            >add new task</v-btn
+          >
+          <server-form-dialog
+            :dialog.sync="dialog"
+            @close="close"
+            @submit="submit"
+            :mode="mode"
+            :editedItem="editedItem"
+          ></server-form-dialog>
+          <delete-dialog
+            :dialog.sync="dialogDelete"
+            :itemName="editedItemName"
+            @confirm-delete="deleteItemConfirm"
+            @cancel-delete="closeDelete"
+          />
+        </v-toolbar>
+      </template>
+      <template v-slot:[`item.actions`]="{ item }">
+        <v-icon small class="pa-2 mr-2" @click.stop="editItem(item)">
+          mdi-pencil
+        </v-icon>
+        <v-icon small class="pa-2" @click.stop="deleteItem(item)">
+          mdi-delete
+        </v-icon>
+      </template>
+    </v-data-table>
+  </div>
 </template>
 
 <script>
-export default {};
+import DeleteDialog from "~/components/servers/DeleteDialog.vue";
+import ServerFormDialog from "~/components/servers/ServerFormDialog.vue";
+export default {
+  components: {
+    DeleteDialog,
+    ServerFormDialog,
+  },
+  data() {
+    return {
+      dialog: false,
+      mode: "add",
+      dialogDelete: false,
+      editedIndex: -1,
+      editedItem: {
+        name: "",
+        created: null,
+        edited: null,
+        tasksIds: [],
+        appsIds: [],
+      },
+      defaultItem: {
+        name: "",
+        created: null,
+        edited: null,
+        tasksIds: [],
+        appsIds: [],
+      },
+    };
+  },
+  watch: {
+    dialog(value) {
+      value || this.close();
+    },
+    deleteDialog(value) {
+      value || this.closeDelete();
+    },
+  },
+  methods: {
+    handleClick(item) {
+      this.$router.push(this.$route.path + "/" + item.id);
+    },
+    editItem(item) {
+      this.mode = "edit";
+      this.editedIndex = this.servers.indexOf(item);
+      this.editedItem = Object.assign({}, item);
+      this.dialog = true;
+    },
+    deleteItem(item) {
+      this.editedIndex = item.id;
+      this.editedItem = Object.assign({}, item);
+      this.dialogDelete = true;
+    },
+    deleteItemConfirm() {
+      this.$store.dispatch("modules/servers/removeServer", this.editedIndex);
+      this.closeDelete();
+    },
+    closeDelete() {
+      this.dialogDelete = false;
+      this.$nextTick(() => {
+        this.editedItem = Object.assign({}, this.defaultItem);
+        this.editedIndex = -1;
+      });
+    },
+    submit(data) {
+      if (this.editedIndex > -1) {
+        this.$store.dispatch("modules/servers/updateServer", {
+          index: this.editedIndex,
+          item: data,
+        });
+      } else {
+        this.$store.dispatch("modules/servers/addServer", data);
+      }
+      this.dialog = false;
+    },
+    close() {
+      this.dialog = false;
+      this.$nextTick(() => {
+        this.editedItem = Object.assign({}, this.defaultItem);
+        this.editedIndex = -1;
+      });
+    },
+    openDialog(mode) {
+      this.mode = mode;
+      this.dialog = true;
+    },
+  },
+  computed: {
+    tasks() {
+      return this.$store.getters["modules/tasks/tasks"];
+    },
+    headers() {
+      return this.$store.getters.getHeaders;
+    },
+    editedItemName() {
+      return this.editedItem.name;
+    },
+  },
+};
 </script>
 
-<style></style>
+<style lang="css">
+tr :hover {
+  cursor: pointer;
+}
+</style>

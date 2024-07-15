@@ -12,7 +12,9 @@
           <v-toolbar-title>Servers</v-toolbar-title>
           <v-divider class="mx-4" inset vertical></v-divider>
           <v-spacer></v-spacer>
-          <v-btn @click="openDialog('add')">add</v-btn>
+          <v-btn color="primary" @click="openDialog('add')"
+            >add new server</v-btn
+          >
           <server-form-dialog
             :dialog.sync="dialog"
             @close="close"
@@ -83,13 +85,14 @@ export default {
       this.$router.push(this.$route.path + "/" + item.id);
     },
     editItem(item) {
-      this.sfmode = "edit";
+      this.mode = "edit";
       this.editedIndex = this.servers.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.dialog = true;
     },
     deleteItem(item) {
       this.editedIndex = item.id;
+      console.log("przekazuje index = ", this.editedIndex);
       this.editedItem = Object.assign({}, item);
       this.dialogDelete = true;
     },

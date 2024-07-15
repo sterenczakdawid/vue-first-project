@@ -11,12 +11,12 @@ export default {
     context.commit("addServer", serverData);
   },
   removeServer(context, serverId) {
-    console.log("removing...", serverId);
-    context.commit("removeServer", serverId);
+    // console.log("removing...", serverId);
+    context.commit("removeServer", parseInt(serverId));
   },
   updateServer(context, serverData) {
     const { index, item } = serverData;
-    console.log("Przekazuje ", { index, item });
+    // console.log("Przekazuje ", { index, item });
     context.commit("updateServer", { index, item });
   },
 };

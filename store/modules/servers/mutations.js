@@ -6,6 +6,7 @@ export default {
     const serverIndex = state.servers.findIndex(
       (server) => server.id === serverId
     );
+    // console.log(typeof serverId, typeof serverIndex);
     state.servers.splice(serverIndex, 1);
   },
   updateServer(state, { index, item }) {
