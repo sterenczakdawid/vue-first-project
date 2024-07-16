@@ -12,20 +12,26 @@
           <v-divider class="mx-4" inset vertical></v-divider>
           <v-spacer></v-spacer>
           <v-btn color="primary" @click="openDialog('add')">add new task</v-btn>
-          <task-form-dialog
+          <form-dialog
             :dialog.sync="dialog"
             @close="close"
             @submit="submit"
             :mode="mode"
-            :editedItem="editedItem"
+            :itemType="'task'"
           >
-          </task-form-dialog>
-          <!-- <delete-dialog
+            <task-form
+              ref="taskForm"
+              :initialData="editedItem"
+              @close="close"
+              @submit="submit"
+            ></task-form>
+          </form-dialog>
+          <delete-dialog
             :dialog.sync="dialogDelete"
             :itemName="editedItemName"
             @confirm-delete="deleteItemConfirm"
             @cancel-delete="closeDelete"
-          /> -->
+          />
         </v-toolbar>
       </template>
       <template v-slot:[`item.actions`]="{ item }">
@@ -42,11 +48,13 @@
 
 <script>
 import DeleteDialog from "~/components/servers/DeleteDialog.vue";
-import TaskFormDialog from "~/components/tasks/TaskFormDialog.vue";
+import FormDialog from "~/components/FormDialog.vue";
+import TaskForm from "~/components/tasks/TaskForm.vue";
 export default {
   components: {
     DeleteDialog,
-    TaskFormDialog,
+    FormDialog,
+    TaskForm,
   },
   data() {
     return {
@@ -70,14 +78,6 @@ export default {
       },
     };
   },
-  watch: {
-    dialog(value) {
-      value || this.close();
-    },
-    deleteDialog(value) {
-      value || this.closeDelete();
-    },
-  },
   methods: {
     handleClick(item) {
       this.$router.push(this.$route.path + "/" + item.id);
@@ -94,7 +94,7 @@ export default {
       this.dialogDelete = true;
     },
     deleteItemConfirm() {
-      this.$store.dispatch("modules/servers/removeServer", this.editedIndex);
+      this.$store.dispatch("modules/tasks/removeTask", this.editedIndex);
       this.closeDelete();
     },
     closeDelete() {
@@ -104,7 +104,7 @@ export default {
         this.editedIndex = -1;
       });
     },
-    submit(data) {
+    submit2(data) {
       if (this.editedIndex > -1) {
         this.$store.dispatch("modules/tasks/updateTask", {
           index: this.editedIndex,
@@ -126,10 +126,26 @@ export default {
       this.mode = mode;
       this.dialog = true;
     },
+    submit({ form, formData }) {
+      if (form.validate()) {
+        const data = {
+          ...formData,
+          edited: new Date().toLocaleString(),
+        };
+        if (!formData.created) {
+          data.created = new Date().toLocaleString();
+        }
+        // this.$emit("submit", data);
+        this.submit2(data);
+      }
+    },
   },
   computed: {
     tasks() {
       return this.$store.getters["modules/tasks/tasks"];
+    },
+    servers() {
+      return this.$store.getters["modules/servers/servers"];
     },
     headers() {
       return this.$store.getters.getHeaders;

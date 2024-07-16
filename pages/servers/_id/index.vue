@@ -1,18 +1,11 @@
 <template>
   <div>
-    <div class="d-flex justify-space-between align-center py-8">
-      <div>
-        <h2>{{ name }} - details</h2>
-        <p class="grey--text text--lighten-1 ma-0">Created: {{ created }}</p>
-        <p class="grey--text text--lighten-1">Edited: {{ edited }}</p>
-      </div>
-      <div class="d-flex flex-column">
-        <v-btn class="mb-2" width="125px" @click="editItem()">Edit</v-btn>
-        <v-btn class="mt-2" color="error" width="125px" @click="deleteItem()"
-          >Delete</v-btn
-        >
-      </div>
-    </div>
+    <item-details
+      :itemType="'Server'"
+      :item="this.selectedServer"
+      @editItem="editItem"
+      @deleteItem="deleteItem"
+    ></item-details>
     <v-tabs v-model="tab" grow>
       <v-tab>Applications</v-tab>
       <v-tab>Tasks</v-tab>
@@ -42,15 +35,18 @@
       :itemName="name"
       :item="this.selectedServer"
       @confirm-delete="deleteItemConfirm"
-      @cancel-delete="closeDelete"
+      @cancel-delete="closeDialog('del')"
     />
     <server-form-dialog
       :dialog.sync="dialogEdit"
-      @close="closeEdit"
-      @submit="editItemSubmit"
       :mode="'edit'"
-      :editedItem="this.editedItem"
-    ></server-form-dialog>
+      :itemType="'server'"
+      ><ServerForm
+        ref="serverForm"
+        :initialData="this.selectedServer"
+        @close="closeDialog('edit')"
+        @submit="submit"
+    /></server-form-dialog>
     <back-button />
   </div>
 </template>
@@ -58,12 +54,16 @@
 <script>
 import BackButton from "~/components/utils/BackButton.vue";
 import DeleteDialog from "~/components/servers/DeleteDialog.vue";
-import ServerFormDialog from "~/components/servers/ServerFormDialog.vue";
+import ServerFormDialog from "~/components/FormDialog.vue";
+import ServerForm from "~/components/servers/ServerForm.vue";
+import ItemDetails from "~/components/ui/ItemDetails.vue";
 export default {
   components: {
     BackButton,
     DeleteDialog,
     ServerFormDialog,
+    ServerForm,
+    ItemDetails,
   },
   data() {
     return {
@@ -120,11 +120,8 @@ export default {
     },
     deleteItemConfirm() {
       this.$store.dispatch("modules/servers/removeServer", this.id);
-      this.closeDelete();
+      this.closeDialog("del");
       this.$router.replace("/servers");
-    },
-    closeDelete() {
-      this.dialogDelete = false;
     },
     editItem() {
       this.editedItem = Object.assign({}, this.selectedServer);
@@ -141,8 +138,37 @@ export default {
         });
       this.dialogEdit = false;
     },
-    closeEdit() {
-      this.dialogEdit = false;
+    submit2(data) {
+      if (this.editedIndex > -1) {
+        this.$store.dispatch("modules/servers/updateServer", {
+          index: this.editedIndex,
+          item: data,
+        });
+      } else {
+        this.$store.dispatch("modules/servers/addServer", data);
+      }
+      console.log(data);
+      this.dialog = false;
+    },
+    submit({ form, formData }) {
+      if (form.validate()) {
+        const data = {
+          ...formData,
+          edited: new Date().toLocaleString(),
+        };
+        if (!formData.created) {
+          data.created = new Date().toLocaleString();
+        }
+        // this.$emit("submit", data);
+        this.submit2(data);
+      }
+    },
+    closeDialog(arg) {
+      if (arg === "edit") {
+        this.dialogEdit = false;
+      } else {
+        this.dialogDelete = false;
+      }
     },
   },
   created() {

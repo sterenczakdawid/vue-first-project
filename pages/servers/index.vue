@@ -15,17 +15,14 @@
           <v-btn color="primary" @click="openDialog('add')"
             >add new server</v-btn
           >
-          <server-form-dialog
-            :dialog.sync="dialog"
-            @close="close"
-            @submit="submit"
-            :mode="mode"
-            :editedItem="editedItem"
-          >
-            <!-- <template v-slot:form>
-              <ServerForm ref="serverForm" :initialData="editedItem" />
-            </template> -->
-          </server-form-dialog>
+          <form-dialog :dialog.sync="dialog" :mode="mode" :itemType="'server'">
+            <ServerForm
+              ref="serverForm"
+              :initialData="editedItem"
+              @close="close"
+              @submit="submit"
+            />
+          </form-dialog>
           <delete-dialog
             :dialog.sync="dialogDelete"
             :itemName="editedItemName"
@@ -49,12 +46,12 @@
 
 <script>
 import DeleteDialog from "~/components/servers/DeleteDialog.vue";
-import ServerFormDialog from "~/components/servers/ServerFormDialog.vue";
+import FormDialog from "~/components/FormDialog.vue";
 import ServerForm from "~/components/servers/ServerForm.vue";
 export default {
   components: {
     DeleteDialog,
-    ServerFormDialog,
+    FormDialog,
     ServerForm,
   },
   data() {
@@ -114,7 +111,7 @@ export default {
         this.editedIndex = -1;
       });
     },
-    submit(data) {
+    submit2(data) {
       if (this.editedIndex > -1) {
         this.$store.dispatch("modules/servers/updateServer", {
           index: this.editedIndex,
@@ -123,7 +120,21 @@ export default {
       } else {
         this.$store.dispatch("modules/servers/addServer", data);
       }
+      console.log(data);
       this.dialog = false;
+    },
+    submit({ form, formData }) {
+      if (form.validate()) {
+        const data = {
+          ...formData,
+          edited: new Date().toLocaleString(),
+        };
+        if (!formData.created) {
+          data.created = new Date().toLocaleString();
+        }
+        // this.$emit("submit", data);
+        this.submit2(data);
+      }
     },
     close() {
       this.dialog = false;

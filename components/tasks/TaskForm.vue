@@ -1,23 +1,29 @@
 <template>
-  <v-form class="d-flex flex-column px-3" ref="form">
+  <v-form
+    class="d-flex flex-column px-3"
+    ref="form"
+    v-model="valid"
+    lazy-validation
+  >
     <v-text-field
-      label="Name"
       v-model.trim="formData.name"
       :rules="nameRules"
+      label="Name"
+      required
     ></v-text-field>
     <v-select
-      v-model="formData.appsIds"
-      :items="apps"
-      label="Applications"
-      multiple
+      v-model="formData.serverId"
+      :items="servers"
+      :rules="serversRules"
+      label="Server"
       item-text="name"
       item-value="id"
+      required
     ></v-select>
     <v-select
-      v-model="formData.tasksIds"
-      :items="tasks"
-      label="Tasks"
-      multiple
+      v-model="formData.appId"
+      :items="apps"
+      label="Application"
       item-text="name"
       item-value="id"
     ></v-select>
@@ -30,7 +36,6 @@
 
 <script>
 export default {
-  name: "ServerForm",
   emits: ["submit", "close"],
   props: {
     initialData: {
@@ -40,30 +45,33 @@ export default {
   },
   data() {
     return {
+      valid: true,
       formData: { ...this.initialData },
       nameRules: [
-        (v) => !!v || "Name is required",
-        (v) => v.length >= 3 || "Name must have at least 3 characters",
+        (v) => !!v.trim() || "Name is required",
+        (v) => v.trim().length >= 3 || "Name must have at least 3 characters",
       ],
+      serversRules: [(v) => v > 0 || "Task has to be attached to a server"],
+      select: null,
     };
   },
   computed: {
     apps() {
       return this.$store.getters["modules/apps/apps"];
     },
-    tasks() {
-      return this.$store.getters["modules/tasks/tasks"];
+    servers() {
+      return this.$store.getters["modules/servers/servers"];
     },
   },
   methods: {
     close() {
+      this.$refs.form.resetValidation();
       this.$emit("close");
     },
     submit() {
       const form = this.$refs.form;
       this.$emit("submit", { form, formData: this.formData });
     },
-    
   },
   watch: {
     initialData: {

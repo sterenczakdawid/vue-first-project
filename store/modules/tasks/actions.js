@@ -10,4 +10,7 @@ export default {
     };
     context.commit("addTask", taskData);
   },
+  removeTask(context, taskId) {
+    context.commit("removeTask", parseInt(taskId));
+  },
 };
