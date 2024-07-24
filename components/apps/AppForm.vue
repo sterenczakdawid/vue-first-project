@@ -16,13 +16,13 @@
       required
     ></v-select>
     <v-select
-      v-model="formData.appId"
-      :items="filteredApps"
-      label="Application"
+      v-model="formData.tasksIds"
+      :items="filteredTasks"
+      label="Tasks"
+      multiple
       item-text="name"
       item-value="id"
       :no-data-text="noDataText"
-      clearable
     ></v-select>
     <div class="align-self-end">
       <v-btn @click="close"> Cancel </v-btn>
@@ -34,52 +34,88 @@
 <script>
 export default {
   emits: ["submit", "close"],
-  props: ["initialData"],
+  props: {
+    initialData: {
+      type: Object,
+      required: true,
+    },
+  },
   data() {
     return {
-      formData: { ...this.initialData },
+      valid: true,
+      formData: this.createFormData(),
       nameRules: [
         (v) => !!v.trim() || "Name is required",
         (v) => v.trim().length >= 3 || "Name must have at least 3 characters",
       ],
       serversRules: [(v) => v > 0 || "Task has to be attached to a server"],
-      select: null,
     };
   },
   computed: {
-    apps() {
-      return this.$store.getters["modules/apps/apps"];
-    },
-    filteredApps() {
-      return this.apps.filter((app) => app.serverId == this.formData.serverId);
+    tasks() {
+      return this.$store.getters["modules/tasks/tasks"];
     },
     servers() {
       return this.$store.getters["modules/servers/servers"];
     },
+    filteredTasks() {
+      return this.tasks.filter(
+        (task) => task.serverId === this.formData.serverId
+      );
+    },
+    tasksIds() {
+      let tasksIds = [];
+      const tasksx = this.tasks.filter(
+        (task) => task.appId == this.initialData.id
+      );
+      // console.log(this.tasks.filter((task) => task.appId == this.initialData.id));
+      tasksx.forEach((task) => {
+        console.log(task.id);
+        tasksIds.push(task.id);
+      });
+      return tasksIds;
+    },
+    selectedTasks() {
+      return this.initialData.id > 0
+        ? this.filteredTasks
+        : this.tasks.filter((task) => task.appId == this.initialData.id);
+    },
     noDataText() {
       return this.formData.serverId === -1
-        ? "Select a server to choose from its applications"
-        : "Selected server has no applications attached";
+        ? "Select a server to choose from its tasks"
+        : "Selected server has no tasks attached";
     },
   },
   methods: {
+    createFormData() {
+      return { ...this.initialData, tasksIds: this.tasksIds };
+    },
+    resetFormData() {
+      this.formData = this.createFormData();
+    },
     close() {
       this.$refs.form.resetValidation();
+      console.log(this.initialData);
       this.$emit("close");
     },
     submit() {
       if (this.$refs.form.validate()) {
         this.$emit("submit", this.formData);
+        this.resetFormData();
+        this.$refs.form.resetValidation();
       }
     },
   },
   watch: {
     initialData: {
-      handler(newData) {
-        this.formData = { ...newData };
+      handler() {
+        this.resetFormData();
       },
       deep: true,
     },
+  },
+  mounted() {
+    this.resetFormData();
   },
 };
 </script>

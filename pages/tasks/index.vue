@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <v-data-table
+    <!-- <v-data-table
       :headers="headers"
       :items="tasks"
       :items-per-page="5"
@@ -12,20 +12,22 @@
           <v-divider class="mx-4" inset vertical></v-divider>
           <v-spacer></v-spacer>
           <v-btn color="primary" @click="openDialog('add')">add new task</v-btn>
-          <form-dialog
-            :dialog.sync="dialog"
-            @close="close"
-            @submit="submit"
-            :mode="mode"
-            :itemType="'task'"
-          >
+          <form-dialog :dialog.sync="dialog" :mode="mode" :itemType="'task'">
             <task-form
-              ref="taskForm"
               :initialData="editedItem"
               @close="close"
               @submit="submit"
             ></task-form>
           </form-dialog>
+          <task-form-dialog
+            :dialog.sync="dialog"
+            :mode="mode"
+            :itemType="'task'"
+            :initialData="editedItem"
+            @close="close"
+            @submit="submit"
+          ></task-form-dialog>
+
           <delete-dialog
             :dialog.sync="dialogDelete"
             :itemName="editedItemName"
@@ -42,19 +44,33 @@
           mdi-delete
         </v-icon>
       </template>
-    </v-data-table>
+    </v-data-table> -->
+    <data-table
+      :items="tasks"
+      :itemType="'task'"
+      :title="'Tasks'"
+      @submit="submit"
+      @openDialog="openDialog"
+      @editItem="editItem"
+      @deleteItem="deleteItem"
+    >
+    </data-table>
   </div>
 </template>
 
 <script>
-import DeleteDialog from "~/components/servers/DeleteDialog.vue";
-import FormDialog from "~/components/FormDialog.vue";
-import TaskForm from "~/components/tasks/TaskForm.vue";
+import DataTable from "~/components/DataTable.vue";
+// import DeleteDialog from "~/components/servers/DeleteDialog.vue";
+// import FormDialog from "~/components/FormDialog.vue";
+// import TaskForm from "~/components/tasks/TaskForm.vue";
+// import TaskFormDialog from "~/components/tasks/TaskFormDialog.vue";
 export default {
   components: {
-    DeleteDialog,
-    FormDialog,
-    TaskForm,
+    // DeleteDialog,
+    // FormDialog,
+    // TaskForm,
+    DataTable,
+    // TaskFormDialog,
   },
   data() {
     return {
@@ -82,9 +98,22 @@ export default {
     handleClick(item) {
       this.$router.push(this.$route.path + "/" + item.id);
     },
+    submit({ index, item }) {
+      if (index > -1) {
+        this.$store.dispatch("modules/tasks/updateTask", {
+          index,
+          item,
+        });
+      } else {
+        this.$store.dispatch("modules/tasks/addTask", item);
+      }
+    },
+    deleteItemConfirm(index) {
+      this.$store.dispatch("modules/tasks/removeTask", index);
+    },
     editItem(item) {
       this.mode = "edit";
-      this.editedIndex = this.servers.indexOf(item);
+      this.editedIndex = this.tasks.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.dialog = true;
     },
@@ -104,17 +133,6 @@ export default {
         this.editedIndex = -1;
       });
     },
-    submit2(data) {
-      if (this.editedIndex > -1) {
-        this.$store.dispatch("modules/tasks/updateTask", {
-          index: this.editedIndex,
-          item: data,
-        });
-      } else {
-        this.$store.dispatch("modules/tasks/addTask", data);
-      }
-      this.dialog = false;
-    },
     close() {
       this.dialog = false;
       this.$nextTick(() => {
@@ -126,26 +144,29 @@ export default {
       this.mode = mode;
       this.dialog = true;
     },
-    submit({ form, formData }) {
-      if (form.validate()) {
-        const data = {
-          ...formData,
-          edited: new Date().toLocaleString(),
-        };
-        if (!formData.created) {
-          data.created = new Date().toLocaleString();
-        }
-        // this.$emit("submit", data);
-        this.submit2(data);
+    submit(formData) {
+      const data = {
+        ...formData,
+        edited: new Date().toLocaleString(),
+      };
+      console.log(formData);
+      if (!formData.created) {
+        data.created = new Date().toLocaleString();
       }
+      if (this.editedIndex > -1) {
+        this.$store.dispatch("modules/tasks/updateTask", {
+          index: this.editedIndex,
+          item: data,
+        });
+      } else {
+        this.$store.dispatch("modules/tasks/addTask", data);
+      }
+      this.dialog = false;
     },
   },
   computed: {
     tasks() {
       return this.$store.getters["modules/tasks/tasks"];
-    },
-    servers() {
-      return this.$store.getters["modules/servers/servers"];
     },
     headers() {
       return this.$store.getters.getHeaders;

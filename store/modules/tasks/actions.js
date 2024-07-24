@@ -10,6 +10,10 @@ export default {
     };
     context.commit("addTask", taskData);
   },
+  updateTask(context, taskData) {
+    const { index, item } = taskData;
+    context.commit("updateTask", { index, item });
+  },
   removeTask(context, taskId) {
     context.commit("removeTask", parseInt(taskId));
   },

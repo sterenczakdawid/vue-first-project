@@ -90,18 +90,19 @@ export default {
     },
     filteredTasks() {
       if (!this.selectedServer) return [];
-      return this.tasks.filter((task) =>
-        this.selectedServer.tasksIds.includes(task.id)
+      return this.tasks.filter(
+        (task) => task.serverId === this.selectedServer.id
       );
     },
     headers() {
       return this.$store.getters.getHeaders;
     },
+    apps() {
+      return this.$store.getters["modules/apps/apps"];
+    },
     filteredApps() {
       if (!this.selectedServer) return [];
-      return this.$store.getters["modules/apps/apps"].filter((app) =>
-        this.selectedServer.appsIds.includes(app.id)
-      );
+      return this.apps.filter((app) => app.serverId === this.selectedServer.id);
     },
     servers() {
       return this.$store.getters["modules/servers/servers"];
@@ -109,7 +110,6 @@ export default {
   },
   methods: {
     handleClick(item) {
-      console.log(item.id);
       this.$router.push("/tasks/" + item.id);
     },
     handleClickApp(item) {

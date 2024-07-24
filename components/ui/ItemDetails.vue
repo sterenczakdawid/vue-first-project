@@ -27,6 +27,7 @@ export default {
   components: {
     BackButton,
   },
+  emits: ["editItem", "deleteItem"],
   props: ["item", "itemType"],
   methods: {
     editItem() {

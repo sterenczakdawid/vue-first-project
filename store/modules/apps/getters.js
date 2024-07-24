@@ -2,7 +2,7 @@ export default {
   apps(state) {
     return state.apps;
   },
-  hasTasks(state) {
+  hasApps(state) {
     return state.apps && state.apps.length > 0;
   },
   nextId: (state) => {

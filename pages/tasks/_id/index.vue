@@ -6,8 +6,20 @@
       @editItem="editItem"
       @deleteItem="deleteItem"
     ></item-details>
-    <p>{{ serverId }}. {{ serverName }}</p>
-    <p>{{ appId }}. {{ appName }}</p>
+    <p>
+      This task is attached to server:
+      <NuxtLink class="link" :to="`/servers/${serverId}`">{{
+        serverName
+      }}</NuxtLink>
+    </p>
+
+    <p v-if="appName">
+      This task is attached to application:
+      <NuxtLink class="link" :to="`/apps/${appId}`">{{ appName }}</NuxtLink>
+    </p>
+    <p v-else class="font-italic">
+      This task is not attached to any application.
+    </p>
     <back-button />
     <form-dialog :dialog.sync="dialogEdit" :mode="'edit'" :itemType="'task'">
       <task-form
@@ -54,6 +66,9 @@ export default {
     servers() {
       return this.$store.getters["modules/servers/servers"];
     },
+    tasks() {
+      return this.$store.getters["modules/tasks/tasks"];
+    },
     apps() {
       return this.$store.getters["modules/apps/apps"];
     },
@@ -70,7 +85,9 @@ export default {
       return this.selectedTask.appId;
     },
     appName() {
-      return this.apps.find((server) => server.id == this.serverId).app;
+      if (this.appId) {
+        return this.apps.find((app) => app.id == this.appId).name;
+      }
     },
     created() {
       return this.selectedTask.created;
@@ -83,6 +100,8 @@ export default {
     this.selectedTask = this.$store.getters["modules/tasks/tasks"].find(
       (task) => task.id == this.id
     );
+    console.log(this.selectedTask);
+    console.log(this.tasks.indexOf(this.selectedTask));
   },
   methods: {
     editItem() {
@@ -104,33 +123,36 @@ export default {
         this.dialogDelete = false;
       }
     },
-    submit2(data) {
-      if (this.editedIndex > -1) {
-        this.$store.dispatch("modules/servers/updateServer", {
-          index: this.editedIndex,
+    submit(formData) {
+      const data = {
+        ...formData,
+        edited: new Date().toLocaleString(),
+      };
+      if (!formData.created) {
+        data.created = new Date().toLocaleString();
+      }
+      if (this.id > -1) {
+        this.$store.dispatch("modules/tasks/updateTask", {
+          index: this.tasks.indexOf(this.selectedTask),
           item: data,
         });
       } else {
-        this.$store.dispatch("modules/servers/addServer", data);
+        this.$store.dispatch("modules/tasks/addTask", data);
       }
-      console.log(data);
-      this.dialog = false;
-    },
-    submit({ form, formData }) {
-      if (form.validate()) {
-        const data = {
-          ...formData,
-          edited: new Date().toLocaleString(),
-        };
-        if (!formData.created) {
-          data.created = new Date().toLocaleString();
-        }
-        // this.$emit("submit", data);
-        this.submit2(data);
-      }
+      this.selectedTask = { ...data }; // Aktualizacja selectedTask
+      this.dialogEdit = false;
     },
   },
 };
 </script>
 
-<style></style>
+<style scoped>
+.link {
+  font-size: 20px;
+  text-decoration: none;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+</style>
