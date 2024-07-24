@@ -64,7 +64,7 @@ export default {
         created: null,
         edited: null,
         serverId: -1,
-        appId: -1,
+        appId: null,
         tasksIds: [],
       },
       defaultItem: {
@@ -72,7 +72,7 @@ export default {
         created: null,
         edited: null,
         serverId: -1,
-        appId: -1,
+        appId: null,
       },
     };
   },

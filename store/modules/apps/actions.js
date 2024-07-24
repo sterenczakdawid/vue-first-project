@@ -32,7 +32,7 @@ export default {
     for (const task of tasks) {
       if (task.appId == item.id) {
         const taskIndex = tasks.findIndex((taskk) => taskk.id == task.id);
-        const taskData = { ...task, appId: -1 };
+        const taskData = { ...task, appId: 0 };
         context.dispatch(
           "modules/tasks/updateTask",
           {

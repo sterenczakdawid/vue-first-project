@@ -64,21 +64,19 @@ export default {
       );
     },
     tasksIds() {
-      let tasksIds = [];
-      const tasksx = this.tasks.filter(
-        (task) => task.appId == this.initialData.id
-      );
-      // console.log(this.tasks.filter((task) => task.appId == this.initialData.id));
-      tasksx.forEach((task) => {
-        console.log(task.id);
-        tasksIds.push(task.id);
-      });
-      return tasksIds;
+      return this.tasks
+        .filter((task) => task.appId === this.initialData.id)
+        .map((task) => task.id);
     },
-    selectedTasks() {
-      return this.initialData.id > 0
-        ? this.filteredTasks
-        : this.tasks.filter((task) => task.appId == this.initialData.id);
+    filteredTasks() {
+      return this.tasks.filter((task) => {
+        return (
+          task.serverId === this.formData.serverId &&
+          (task.appId === this.formData.id ||
+            task.appId === 0 ||
+            task.appId == null)
+        );
+      });
     },
     noDataText() {
       return this.formData.serverId === -1
@@ -94,8 +92,9 @@ export default {
       this.formData = this.createFormData();
     },
     close() {
+      console.log("initial: ", this.initialData);
+      console.log("form", this.formData);
       this.$refs.form.resetValidation();
-      console.log(this.initialData);
       this.$emit("close");
     },
     submit() {
@@ -105,6 +104,9 @@ export default {
         this.$refs.form.resetValidation();
       }
     },
+    resetTasks() {
+      this.formData.tasksIds = [];
+    },
   },
   watch: {
     initialData: {
@@ -112,6 +114,12 @@ export default {
         this.resetFormData();
       },
       deep: true,
+    },
+    "formData.serverId": {
+      handler() {
+        this.resetTasks();
+      },
+      immediate: true,
     },
   },
   mounted() {
