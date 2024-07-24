@@ -100,8 +100,8 @@ export default {
     this.selectedTask = this.$store.getters["modules/tasks/tasks"].find(
       (task) => task.id == this.id
     );
-    console.log(this.selectedTask);
-    console.log(this.tasks.indexOf(this.selectedTask));
+    // console.log(this.selectedTask);
+    // console.log(this.tasks.indexOf(this.selectedTask));
   },
   methods: {
     editItem() {
@@ -139,7 +139,7 @@ export default {
       } else {
         this.$store.dispatch("modules/tasks/addTask", data);
       }
-      this.selectedTask = { ...data }; // Aktualizacja selectedTask
+      this.selectedTask = { ...data };
       this.dialogEdit = false;
     },
   },

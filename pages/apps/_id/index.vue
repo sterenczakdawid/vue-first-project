@@ -92,7 +92,7 @@ export default {
       this.$router.push("/tasks/" + item.id);
     },
     editItem() {
-      this.editedItem = Object.assign({}, this.selectedTask);
+      this.editedItem = Object.assign({}, this.selectedApp);
       this.dialogEdit = true;
     },
     deleteItem() {
