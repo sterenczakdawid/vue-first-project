@@ -2,14 +2,34 @@
   <div class="container">
     <v-data-table
       :headers="headers"
-      :items="apps"
+      :items="filteredApps"
       :items-per-page="5"
+      :search="search"
       @click:row="handleClick"
     >
       <template v-slot:top>
         <v-toolbar flat>
           <v-toolbar-title>Apps</v-toolbar-title>
           <v-divider class="mx-4" inset vertical></v-divider>
+          <v-spacer></v-spacer>
+          <v-text-field
+            v-model="search"
+            append-icon="mdi-magnify"
+            label="Search"
+            single-line
+            hide-details
+          ></v-text-field>
+          <v-spacer></v-spacer>
+          <v-select
+            v-model="selectedServer"
+            :items="servers"
+            item-text="name"
+            item-value="id"
+            label="Select server"
+            hide-details
+            clearable
+            class="maxw"
+          ></v-select>
           <v-spacer></v-spacer>
           <v-btn color="primary" @click="openDialog('add')">add new app</v-btn>
           <form-dialog :dialog.sync="dialog" :mode="mode" :itemType="'app'">
@@ -56,6 +76,8 @@ export default {
   },
   data() {
     return {
+      search: "",
+      selectedServer: null,
       dialog: false,
       mode: "add",
       dialogDelete: false,
@@ -137,8 +159,22 @@ export default {
     },
   },
   computed: {
+    servers() {
+      return this.$store.getters["modules/servers/servers"];
+    },
     apps() {
       return this.$store.getters["modules/apps/apps"];
+    },
+    filteredApps() {
+      return this.apps.filter((app) => {
+        const serverMatch = this.selectedServer
+          ? app.serverId === this.selectedServer
+          : true;
+        const nameMatch = app.name
+          .toLowerCase()
+          .includes(this.search.toLowerCase());
+        return serverMatch && nameMatch;
+      });
     },
     headers() {
       return this.$store.getters.getHeaders;
@@ -153,5 +189,8 @@ export default {
 <style lang="css">
 tr :hover {
   cursor: pointer;
+}
+.maxw {
+  max-width: 300px;
 }
 </style>

@@ -2,8 +2,9 @@
   <div class="container">
     <v-data-table
       :headers="headers"
-      :items="servers"
+      :items="filteredServers"
       :items-per-page="5"
+      :search="search"
       v-if="hasServers"
       @click:row="handleClick"
     >
@@ -11,6 +12,14 @@
         <v-toolbar flat>
           <v-toolbar-title>Servers</v-toolbar-title>
           <v-divider class="mx-4" inset vertical></v-divider>
+          <v-spacer></v-spacer>
+          <v-text-field
+            v-model="search"
+            append-icon="mdi-magnify"
+            label="Search"
+            single-line
+            hide-details
+          ></v-text-field>
           <v-spacer></v-spacer>
           <v-btn color="primary" @click="openDialog('add')"
             >add new server</v-btn
@@ -67,6 +76,7 @@ export default {
   },
   data() {
     return {
+      search: "",
       dialog: false,
       mode: "add",
       dialogDelete: false,
@@ -149,6 +159,12 @@ export default {
     },
     hasServers() {
       return this.$store.getters["modules/servers/hasServers"];
+    },
+    filteredServers() {
+      const searchLower = this.search.toLowerCase();
+      return this.servers.filter((server) =>
+        server.name.toLowerCase().includes(searchLower)
+      );
     },
     headers() {
       return this.$store.getters.getHeaders;

@@ -2,14 +2,46 @@
   <div class="container">
     <v-data-table
       :headers="headers"
-      :items="tasks"
+      :items="filteredTasks"
       :items-per-page="5"
+      :search="search"
       @click:row="handleClick"
     >
       <template v-slot:top>
         <v-toolbar flat>
           <v-toolbar-title>Tasks</v-toolbar-title>
           <v-divider class="mx-4" inset vertical></v-divider>
+          <v-spacer></v-spacer>
+          <v-text-field
+            v-model="search"
+            append-icon="mdi-magnify"
+            label="Search"
+            single-line
+            hide-details
+          ></v-text-field>
+          <v-spacer></v-spacer>
+          <v-select
+            v-model="selectedServer"
+            :items="servers"
+            item-text="name"
+            item-value="id"
+            label="Select server"
+            hide-details
+            clearable
+            class="lol"
+          ></v-select>
+          <v-spacer></v-spacer>
+          <v-select
+            v-model="selectedApp"
+            :items="filteredApps"
+            item-text="name"
+            item-value="id"
+            label="Select app"
+            hide-details
+            single-line
+            class="lol"
+            clearable
+          ></v-select>
           <v-spacer></v-spacer>
           <v-btn color="primary" @click="openDialog('add')">add new task</v-btn>
           <form-dialog :dialog.sync="dialog" :mode="mode" :itemType="'task'">
@@ -66,6 +98,9 @@ export default {
   },
   data() {
     return {
+      search: "",
+      selectedServer: null,
+      selectedApp: null,
       dialog: false,
       mode: "add",
       dialogDelete: false,
@@ -147,6 +182,12 @@ export default {
     },
   },
   computed: {
+    servers() {
+      return this.$store.getters["modules/servers/servers"];
+    },
+    apps() {
+      return this.$store.getters["modules/apps/apps"];
+    },
     tasks() {
       return this.$store.getters["modules/tasks/tasks"];
     },
@@ -156,6 +197,25 @@ export default {
     editedItemName() {
       return this.editedItem.name;
     },
+    filteredTasks() {
+      return this.tasks.filter((task) => {
+        const serverMatch = this.selectedServer
+          ? task.serverId === this.selectedServer
+          : true;
+        const appMatch = this.selectedApp
+          ? task.appId === this.selectedApp
+          : true;
+        const nameMatch = task.name
+          .toLowerCase()
+          .includes(this.search.toLowerCase());
+        return serverMatch && appMatch && nameMatch;
+      });
+    },
+    filteredApps() {
+      return this.selectedServer
+        ? this.apps.filter((app) => app.serverId === this.selectedServer)
+        : this.apps;
+    },
   },
 };
 </script>
@@ -163,5 +223,8 @@ export default {
 <style lang="css">
 tr :hover {
   cursor: pointer;
+}
+.lol {
+  max-width: 230px;
 }
 </style>
