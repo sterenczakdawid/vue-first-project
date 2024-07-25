@@ -4,23 +4,8 @@
       label="Name"
       v-model.trim="formData.name"
       :rules="nameRules"
+      required
     ></v-text-field>
-    <v-select
-      v-model="formData.appsIds"
-      :items="apps"
-      label="Applications"
-      multiple
-      item-text="name"
-      item-value="id"
-    ></v-select>
-    <v-select
-      v-model="formData.tasksIds"
-      :items="tasks"
-      label="Tasks"
-      multiple
-      item-text="name"
-      item-value="id"
-    ></v-select>
     <div class="align-self-end">
       <v-btn @click="close"> Cancel </v-btn>
       <v-btn class="success" @click="submit">Submit</v-btn>
@@ -30,17 +15,11 @@
 
 <script>
 export default {
-  name: "ServerForm",
   emits: ["submit", "close"],
-  props: {
-    initialData: {
-      type: Object,
-      required: true,
-    },
-  },
+  props: ["initialData"],
   data() {
     return {
-      formData: { ...this.initialData },
+      formData: this.createFormData(),
       nameRules: [
         (v) => !!v || "Name is required",
         (v) => v.length >= 3 || "Name must have at least 3 characters",
@@ -56,22 +35,31 @@ export default {
     },
   },
   methods: {
+    createFormData() {
+      return { ...this.initialData };
+    },
     close() {
+      this.$refs.form.resetValidation();
       this.$emit("close");
     },
     submit() {
-      const form = this.$refs.form;
-      this.$emit("submit", { form, formData: this.formData });
+      if (this.$refs.form.validate()) {
+        this.$emit("submit", this.formData);
+        this.formData = this.createFormData();
+        this.$refs.form.resetValidation();
+      }
     },
-    
   },
   watch: {
     initialData: {
-      handler(newData) {
-        this.formData = { ...newData };
+      handler() {
+        this.formData = this.createFormData();
       },
       deep: true,
     },
+  },
+  mounted() {
+    this.formData = this.createFormData();
   },
 };
 </script>

@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <!-- <v-data-table
+    <v-data-table
       :headers="headers"
       :items="tasks"
       :items-per-page="5"
@@ -19,18 +19,10 @@
               @submit="submit"
             ></task-form>
           </form-dialog>
-          <task-form-dialog
-            :dialog.sync="dialog"
-            :mode="mode"
-            :itemType="'task'"
-            :initialData="editedItem"
-            @close="close"
-            @submit="submit"
-          ></task-form-dialog>
-
           <delete-dialog
             :dialog.sync="dialogDelete"
             :itemName="editedItemName"
+            :itemType="'task'"
             @confirm-delete="deleteItemConfirm"
             @cancel-delete="closeDelete"
           />
@@ -44,8 +36,8 @@
           mdi-delete
         </v-icon>
       </template>
-    </v-data-table> -->
-    <data-table
+    </v-data-table>
+    <!-- <data-table
       :items="tasks"
       :itemType="'task'"
       :title="'Tasks'"
@@ -54,23 +46,23 @@
       @editItem="editItem"
       @deleteItem="deleteItem"
     >
-    </data-table>
+    </data-table> -->
   </div>
 </template>
 
 <script>
 import DataTable from "~/components/DataTable.vue";
-// import DeleteDialog from "~/components/servers/DeleteDialog.vue";
-// import FormDialog from "~/components/FormDialog.vue";
-// import TaskForm from "~/components/tasks/TaskForm.vue";
-// import TaskFormDialog from "~/components/tasks/TaskFormDialog.vue";
+import DeleteDialog from "~/components/servers/DeleteDialog.vue";
+import FormDialog from "~/components/FormDialog.vue";
+import TaskForm from "~/components/tasks/TaskForm.vue";
+import TaskFormDialog from "~/components/tasks/TaskFormDialog.vue";
 export default {
   components: {
-    // DeleteDialog,
-    // FormDialog,
-    // TaskForm,
+    DeleteDialog,
+    FormDialog,
+    TaskForm,
     DataTable,
-    // TaskFormDialog,
+    TaskFormDialog,
   },
   data() {
     return {
@@ -97,16 +89,6 @@ export default {
   methods: {
     handleClick(item) {
       this.$router.push(this.$route.path + "/" + item.id);
-    },
-    submit({ index, item }) {
-      if (index > -1) {
-        this.$store.dispatch("modules/tasks/updateTask", {
-          index,
-          item,
-        });
-      } else {
-        this.$store.dispatch("modules/tasks/addTask", item);
-      }
     },
     deleteItemConfirm(index) {
       this.$store.dispatch("modules/tasks/removeTask", index);

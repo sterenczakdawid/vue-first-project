@@ -15,15 +15,16 @@
           <form-dialog :dialog.sync="dialog" :mode="mode" :itemType="'app'">
             <app-form
               :initialData="editedItem"
-              @close="close"
+              @close="closeDialog(false)"
               @submit="submit"
             ></app-form>
           </form-dialog>
           <delete-dialog
             :dialog.sync="dialogDelete"
             :itemName="editedItemName"
+            :itemType="'app'"
             @confirm-delete="deleteItemConfirm"
-            @cancel-delete="closeDelete"
+            @cancel-delete="closeDialog(true)"
           />
         </v-toolbar>
       </template>
@@ -64,7 +65,7 @@ export default {
         created: null,
         edited: null,
         serverId: -1,
-        appId: null,
+        appId: 0,
         tasksIds: [],
       },
       defaultItem: {
@@ -72,7 +73,8 @@ export default {
         created: null,
         edited: null,
         serverId: -1,
-        appId: null,
+        appId: 0,
+        tasksIds: [],
       },
     };
   },
@@ -98,15 +100,12 @@ export default {
       this.$store.dispatch("modules/apps/removeApp", this.editedIndex);
       this.closeDelete();
     },
-    closeDelete() {
-      this.dialogDelete = false;
-      this.$nextTick(() => {
-        this.editedItem = Object.assign({}, this.defaultItem);
-        this.editedIndex = -1;
-      });
-    },
-    close() {
-      this.dialog = false;
+    closeDialog(isDelete) {
+      if (isDelete) {
+        this.deleteDialog = false;
+      } else {
+        this.dialog = false;
+      }
       this.$nextTick(() => {
         this.editedItem = Object.assign({}, this.defaultItem);
         this.editedIndex = -1;
@@ -114,10 +113,10 @@ export default {
     },
     openDialog(mode) {
       this.mode = mode;
+      this.editedItem = Object.assign({}, this.defaultItem);
       this.dialog = true;
     },
     submit(formData) {
-      // console.log("submit w apps/index.vue");
       const data = {
         ...formData,
         edited: new Date().toLocaleString(),

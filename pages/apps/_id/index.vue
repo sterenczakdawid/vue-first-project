@@ -30,7 +30,7 @@
     <delete-dialog
       :dialog.sync="dialogDelete"
       :itemName="name"
-      :item="this.selectedApp"
+      :itemType="'app'"
       @confirm-delete="deleteItemConfirm"
       @cancel-delete="closeDialog('del')"
     />

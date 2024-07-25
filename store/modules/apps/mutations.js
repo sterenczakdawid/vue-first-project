@@ -9,4 +9,7 @@ export default {
     const appIndex = state.apps.findIndex((app) => app.id === appId);
     state.apps.splice(appIndex, 1);
   },
+  removeServerApps(state, serverId) {
+    state.apps = state.apps.filter((app) => app.serverId != serverId);
+  },
 };

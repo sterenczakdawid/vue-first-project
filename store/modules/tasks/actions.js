@@ -17,4 +17,13 @@ export default {
   removeTask(context, taskId) {
     context.commit("removeTask", parseInt(taskId));
   },
+  removeServerTasks(context, serverId) {
+    context.commit("removeServerTasks", parseInt(serverId));
+  },
+  detachTasksFromApp(context, appId) {
+    context.commit("detachTasksFromApp", parseInt(appId));
+  },
+  attachTasksToApp(context, app) {
+    context.commit("attachTasksToApp", app);
+  },
 };

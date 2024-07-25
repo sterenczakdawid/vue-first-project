@@ -4,11 +4,16 @@
       <v-card-title class="font-weight-regular"
         >Are you sure you want to delete {{ itemName }}?</v-card-title
       >
-      <!-- <v-card-subtitle v-if="hasSubitems" class="red--text mt-3"
-        ><span class="font-weight-bold">Warning!</span> This item has other
-        items pinned to it. By deleting this item its subitems will also be
-        deleted</v-card-subtitle
-      > -->
+      <v-card-subtitle v-if="itemType === 'app'" class="red--text mt-1"
+        ><span class="font-weight-bold">Warning!</span> Deleting this
+        application will detach all associated tasks, leaving them unlinked to
+        any application!
+      </v-card-subtitle>
+      <v-card-subtitle v-else-if="itemType === 'server'" class="red--text mt-1"
+        ><span class="font-weight-bold">Warning!</span> Deleting this server
+        will automatically remove all associated tasks and
+        applications!</v-card-subtitle
+      >
       <v-card-actions>
         <v-spacer></v-spacer>
         <v-btn elevation="4" @click="cancel" width="120px">Cancel</v-btn>
@@ -23,27 +28,7 @@
 
 <script>
 export default {
-  props: {
-    dialog: {
-      type: Boolean,
-      required: true,
-    },
-    itemName: {
-      type: String,
-      required: true,
-    },
-    // item: {
-    //   type: Object,
-    // },
-  },
-  computed: {
-    // hasSubitems() {
-    //   return (
-    //     (Object.hasOwn(this.item, "tasksIds") && this.item.tasksIds.length) ||
-    //     Object.hasOwn(this.item, "appsIds" && this.item.appsIds.length)
-    //   );
-    // },
-  },
+  props: ["dialog", "itemName", "itemType"],
   methods: {
     cancel() {
       this.$emit("update:dialog", false);

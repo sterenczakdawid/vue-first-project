@@ -5,7 +5,9 @@
         >{{ dialogTitle }}{{ itemType }}</v-card-title
       >
       <v-card-text>
-        <slot></slot>
+        <v-container v-if="dialog">
+          <slot></slot>
+        </v-container>
       </v-card-text>
     </v-card>
   </v-dialog>

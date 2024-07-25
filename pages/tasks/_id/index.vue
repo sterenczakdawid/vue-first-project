@@ -32,7 +32,7 @@
     <delete-dialog
       :dialog.sync="dialogDelete"
       :itemName="name"
-      :item="this.selectedTask"
+      :itemType="'task'"
       @confirm-delete="deleteItemConfirm"
       @cancel-delete="closeDialog('del')"
     />
@@ -85,7 +85,7 @@ export default {
       return this.selectedTask.appId;
     },
     appName() {
-      if (this.appId) {
+      if (this.appId != 0 && this.appId !== null) {
         return this.apps.find((app) => app.id == this.appId).name;
       }
     },
@@ -100,7 +100,7 @@ export default {
     this.selectedTask = this.$store.getters["modules/tasks/tasks"].find(
       (task) => task.id == this.id
     );
-    // console.log(this.selectedTask);
+    console.log(this.appId);
     // console.log(this.tasks.indexOf(this.selectedTask));
   },
   methods: {

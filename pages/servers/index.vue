@@ -16,8 +16,7 @@
             >add new server</v-btn
           >
           <form-dialog :dialog.sync="dialog" :mode="mode" :itemType="'server'">
-            <ServerForm
-              ref="serverForm"
+            <server-form
               :initialData="editedItem"
               @close="close"
               @submit="submit"
@@ -26,7 +25,7 @@
           <delete-dialog
             :dialog.sync="dialogDelete"
             :itemName="editedItemName"
-            :item="editedItem"
+            :itemType="'server'"
             @confirm-delete="deleteItemConfirm"
             @cancel-delete="closeDelete"
           />
@@ -41,7 +40,7 @@
         </v-icon>
       </template>
     </v-data-table>
-    <data-table
+    <!-- <data-table
       :headers="headers"
       :items="servers"
       :itemType="'server'"
@@ -52,7 +51,7 @@
       @editItem="editItem"
       @deleteItem="deleteItem"
     >
-    </data-table>
+    </data-table> -->
   </div>
 </template>
 
@@ -88,14 +87,6 @@ export default {
       },
     };
   },
-  watch: {
-    dialog(value) {
-      value || this.close();
-    },
-    deleteDialog(value) {
-      value || this.closeDelete();
-    },
-  },
   methods: {
     handleClick(item) {
       this.$router.push(this.$route.path + "/" + item.id);
@@ -108,7 +99,6 @@ export default {
     },
     deleteItem(item) {
       this.editedIndex = item.id;
-      console.log("przekazuje index = ", this.editedIndex);
       this.editedItem = Object.assign({}, item);
       this.dialogDelete = true;
     },
@@ -123,7 +113,14 @@ export default {
         this.editedIndex = -1;
       });
     },
-    submit2(data) {
+    submit(formData) {
+      const data = {
+        ...formData,
+        edited: new Date().toLocaleString(),
+      };
+      if (!formData.created) {
+        data.created = new Date().toLocaleString();
+      }
       if (this.editedIndex > -1) {
         this.$store.dispatch("modules/servers/updateServer", {
           index: this.editedIndex,
@@ -132,21 +129,7 @@ export default {
       } else {
         this.$store.dispatch("modules/servers/addServer", data);
       }
-      console.log(data);
       this.dialog = false;
-    },
-    submit({ form, formData }) {
-      if (form.validate()) {
-        const data = {
-          ...formData,
-          edited: new Date().toLocaleString(),
-        };
-        if (!formData.created) {
-          data.created = new Date().toLocaleString();
-        }
-        // this.$emit("submit", data);
-        this.submit2(data);
-      }
     },
     close() {
       this.dialog = false;

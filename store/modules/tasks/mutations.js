@@ -9,4 +9,23 @@ export default {
     const taskIndex = state.tasks.findIndex((task) => task.id === taskId);
     state.tasks.splice(taskIndex, 1);
   },
+  removeServerTasks(state, serverId) {
+    state.tasks = state.tasks.filter((task) => task.serverId != serverId);
+  },
+  detachTasksFromApp(state, appId) {
+    state.tasks.forEach((task) => {
+      if (task.appId === appId) {
+        task.appId = 0;
+      }
+    });
+  },
+  attachTasksToApp(state, { id, tasksIds }) {
+    if (tasksIds) {
+      state.tasks.forEach((task) => {
+        if (tasksIds.includes(task.id)) {
+          task.appId = id;
+        }
+      });
+    }
+  },
 };

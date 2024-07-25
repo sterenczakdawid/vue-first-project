@@ -37,13 +37,12 @@ export default {
   props: ["initialData"],
   data() {
     return {
-      formData: { ...this.initialData },
+      formData: this.createFormData(),
       nameRules: [
         (v) => !!v.trim() || "Name is required",
         (v) => v.trim().length >= 3 || "Name must have at least 3 characters",
       ],
       serversRules: [(v) => v > 0 || "Task has to be attached to a server"],
-      select: null,
     };
   },
   computed: {
@@ -63,6 +62,9 @@ export default {
     },
   },
   methods: {
+    createFormData() {
+      return { ...this.initialData };
+    },
     close() {
       this.$refs.form.resetValidation();
       this.$emit("close");
@@ -70,16 +72,30 @@ export default {
     submit() {
       if (this.$refs.form.validate()) {
         this.$emit("submit", this.formData);
+        this.formData = this.createFormData();
+        this.$refs.form.resetValidation();
       }
+    },
+    resetApp() {
+      this.formData.appId = 0;
     },
   },
   watch: {
     initialData: {
-      handler(newData) {
-        this.formData = { ...newData };
+      handler() {
+        this.formData = this.createFormData();
       },
       deep: true,
     },
+    "formData.serverId": {
+      handler() {
+        this.resetApp();
+      },
+      immediate: true,
+    },
+  },
+  mounted() {
+    this.formData = this.createFormData();
   },
 };
 </script>

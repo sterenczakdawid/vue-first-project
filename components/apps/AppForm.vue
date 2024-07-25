@@ -1,9 +1,9 @@
 <template>
   <v-form class="d-flex flex-column px-3" ref="form" lazy-validation>
     <v-text-field
+      label="Name"
       v-model.trim="formData.name"
       :rules="nameRules"
-      label="Name"
       required
     ></v-text-field>
     <v-select
@@ -23,6 +23,7 @@
       item-text="name"
       item-value="id"
       :no-data-text="noDataText"
+      clearable
     ></v-select>
     <div class="align-self-end">
       <v-btn @click="close"> Cancel </v-btn>
@@ -34,15 +35,9 @@
 <script>
 export default {
   emits: ["submit", "close"],
-  props: {
-    initialData: {
-      type: Object,
-      required: true,
-    },
-  },
+  props: ["initialData"],
   data() {
     return {
-      valid: true,
       formData: this.createFormData(),
       nameRules: [
         (v) => !!v.trim() || "Name is required",
@@ -52,16 +47,11 @@ export default {
     };
   },
   computed: {
-    tasks() {
-      return this.$store.getters["modules/tasks/tasks"];
-    },
     servers() {
       return this.$store.getters["modules/servers/servers"];
     },
-    filteredTasks() {
-      return this.tasks.filter(
-        (task) => task.serverId === this.formData.serverId
-      );
+    tasks() {
+      return this.$store.getters["modules/tasks/tasks"];
     },
     tasksIds() {
       return this.tasks
@@ -88,19 +78,14 @@ export default {
     createFormData() {
       return { ...this.initialData, tasksIds: this.tasksIds };
     },
-    resetFormData() {
-      this.formData = this.createFormData();
-    },
     close() {
-      console.log("initial: ", this.initialData);
-      console.log("form", this.formData);
       this.$refs.form.resetValidation();
       this.$emit("close");
     },
     submit() {
       if (this.$refs.form.validate()) {
         this.$emit("submit", this.formData);
-        this.resetFormData();
+        this.formData = this.createFormData();
         this.$refs.form.resetValidation();
       }
     },
@@ -111,7 +96,7 @@ export default {
   watch: {
     initialData: {
       handler() {
-        this.resetFormData();
+        this.formData = this.createFormData();
       },
       deep: true,
     },
@@ -123,7 +108,7 @@ export default {
     },
   },
   mounted() {
-    this.resetFormData();
+    this.formData = this.createFormData();
   },
 };
 </script>

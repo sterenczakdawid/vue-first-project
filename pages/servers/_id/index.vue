@@ -33,7 +33,7 @@
     <delete-dialog
       :dialog.sync="dialogDelete"
       :itemName="name"
-      :item="this.selectedServer"
+      :itemType="'server'"
       @confirm-delete="deleteItemConfirm"
       @cancel-delete="closeDialog('del')"
     />
@@ -138,30 +138,24 @@ export default {
         });
       this.dialogEdit = false;
     },
-    submit2(data) {
-      if (this.editedIndex > -1) {
+    submit(formData) {
+      const data = {
+        ...formData,
+        edited: new Date().toLocaleString(),
+      };
+      if (!formData.created) {
+        data.created = new Date().toLocaleString();
+      }
+      if (this.id > -1) {
         this.$store.dispatch("modules/servers/updateServer", {
-          index: this.editedIndex,
+          index: this.servers.indexOf(this.selectedServer),
           item: data,
         });
       } else {
         this.$store.dispatch("modules/servers/addServer", data);
       }
-      console.log(data);
-      this.dialog = false;
-    },
-    submit({ form, formData }) {
-      if (form.validate()) {
-        const data = {
-          ...formData,
-          edited: new Date().toLocaleString(),
-        };
-        if (!formData.created) {
-          data.created = new Date().toLocaleString();
-        }
-        // this.$emit("submit", data);
-        this.submit2(data);
-      }
+      this.selectedServer = { ...data };
+      this.dialogEdit = false;
     },
     closeDialog(arg) {
       if (arg === "edit") {
