@@ -41,6 +41,7 @@ export default {
       nameRules: [
         (v) => !!v.trim() || this.$t("errors.nameRequired"),
         (v) => v.trim().length >= 3 || this.$t("errors.nameTooShort"),
+        this.uniqueNameRule,
       ],
       serversRules: [(v) => v > 0 || this.$t("errors.taskAttachedToServer")],
     };
@@ -49,17 +50,20 @@ export default {
     apps() {
       return this.$store.getters["modules/apps/apps"];
     },
-    filteredApps() {
-      return this.apps.filter((app) => app.serverId == this.formData.serverId);
+    tasks() {
+      return this.$store.getters["modules/tasks/tasks"];
     },
-    servers() {
-      return this.$store.getters["modules/servers/servers"];
-    },
-    noDataText() {
-      return this.formData.serverId === -1
-        ? this.$t("noDataText.noServerApp")
-        : this.$t("noDataText.noServerApps");
-    },
+  },
+  filteredApps() {
+    return this.apps.filter((app) => app.serverId == this.formData.serverId);
+  },
+  servers() {
+    return this.$store.getters["modules/servers/servers"];
+  },
+  noDataText() {
+    return this.formData.serverId === -1
+      ? this.$t("noDataText.noServerApp")
+      : this.$t("noDataText.noServerApps");
   },
   methods: {
     createFormData() {
@@ -78,6 +82,16 @@ export default {
     },
     resetApp() {
       this.formData.appId = 0;
+    },
+    uniqueNameRule(v) {
+      if (
+        this.tasks.some(
+          (task) => task.name === v && task.id !== this.formData.id
+        )
+      ) {
+        return this.$t("errors.taskNameAlreadyExists");
+      }
+      return true;
     },
   },
   watch: {

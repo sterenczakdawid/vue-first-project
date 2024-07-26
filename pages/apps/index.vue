@@ -49,6 +49,7 @@
             @confirm-delete="deleteItemConfirm"
             @cancel-delete="closeDialog(true)"
           />
+          <!-- <item-actions></item-actions> -->
         </v-toolbar>
       </template>
       <template v-slot:[`item.actions`]="{ item }">
@@ -71,6 +72,7 @@ import TaskForm from "~/components/forms/TaskForm.vue";
 import AppForm from "~/components/forms/AppForm.vue";
 import { headers } from "~/constants/headers";
 import { pagination } from "~/constants/pagination";
+import ItemActions from "~/components/ui/ItemActions.vue";
 export default {
   components: {
     DeleteDialog,
@@ -78,6 +80,7 @@ export default {
     TaskForm,
     DataTable,
     AppForm,
+    ItemActions,
   },
   data() {
     return {

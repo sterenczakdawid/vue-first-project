@@ -40,6 +40,9 @@ const pl = {
     nameTooShort: "Nazwa powinna mieć długość minimum 3 znaków",
     taskAttachedToServer: "Zadanie musi być podpięte do serwera",
     appAttachedToServer: "Aplikacja musi być podpięta do serwera",
+    serverNameAlreadyExists: "Serwer o takiej nazwie już istnieje",
+    appNameAlreadyExists: "Aplikacja o takiej nazwie już istnieje",
+    taskNameAlreadyExists: "Zadanie o takiej nazwie już istnieje",
   },
   noDataText: {
     noServer: "Wybierz serwer, aby zobaczyć podpięte zadania",

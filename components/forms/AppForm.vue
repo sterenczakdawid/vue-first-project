@@ -42,6 +42,7 @@ export default {
       nameRules: [
         (v) => !!v.trim() || this.$t("errors.nameRequired"),
         (v) => v.trim().length >= 3 || this.$t("errors.nameTooShort"),
+        this.uniqueNameRule,
       ],
       serversRules: [(v) => v > 0 || this.$t("errors.appAttachedToServer")],
     };
@@ -49,6 +50,9 @@ export default {
   computed: {
     servers() {
       return this.$store.getters["modules/servers/servers"];
+    },
+    apps() {
+      return this.$store.getters["modules/apps/apps"];
     },
     tasks() {
       return this.$store.getters["modules/tasks/tasks"];
@@ -91,6 +95,14 @@ export default {
     },
     resetTasks() {
       this.formData.tasksIds = [];
+    },
+    uniqueNameRule(v) {
+      if (
+        this.apps.some((app) => app.name === v && app.id !== this.formData.id)
+      ) {
+        return this.$t("errors.appNameAlreadyExists");
+      }
+      return true;
     },
   },
   watch: {

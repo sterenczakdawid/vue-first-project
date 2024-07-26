@@ -23,6 +23,7 @@ export default {
       nameRules: [
         (v) => !!v || this.$t("errors.nameRequired"),
         (v) => v.length >= 3 || this.$t("errors.nameTooShort"),
+        this.uniqueNameRule,
       ],
     };
   },
@@ -32,6 +33,9 @@ export default {
     },
     tasks() {
       return this.$store.getters["modules/tasks/tasks"];
+    },
+    servers() {
+      return this.$store.getters["modules/servers/servers"];
     },
   },
   methods: {
@@ -48,6 +52,16 @@ export default {
         this.formData = this.createFormData();
         this.$refs.form.resetValidation();
       }
+    },
+    uniqueNameRule(v) {
+      if (
+        this.servers.some(
+          (server) => server.name === v && server.id !== this.formData.id
+        )
+      ) {
+        return this.$t("errors.serverNameAlreadyExists");
+      }
+      return true;
     },
   },
   watch: {

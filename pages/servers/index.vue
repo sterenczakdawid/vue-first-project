@@ -50,18 +50,6 @@
         </v-icon>
       </template>
     </v-data-table>
-    <!-- <data-table
-      :headers="headers"
-      :items="servers"
-      :itemType="'server'"
-      :title="'costam'"
-      :addButtonLabel="'lol'"
-      @submit="submit"
-      @openDialog="openDialog"
-      @editItem="editItem"
-      @deleteItem="deleteItem"
-    >
-    </data-table> -->
   </div>
 </template>
 

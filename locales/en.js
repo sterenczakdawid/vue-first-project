@@ -39,6 +39,9 @@ const en = {
     nameTooShort: "Name must have at least 3 characters",
     taskAttachedToServer: "Task has to be attached to a server",
     appAttachedToServer: "App has to be attached to a server",
+    serverNameAlreadyExists: "Server with given name already exists",
+    appNameAlreadyExists: "Application with given name already exists",
+    taskNameAlreadyExists: "Task with given name already exists",
   },
   noDataText: {
     noServer: "Select a server to choose from its tasks",
