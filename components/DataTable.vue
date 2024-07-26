@@ -116,11 +116,11 @@ export default {
 </template>
 
 <script>
-import DeleteDialog from "~/components/servers/DeleteDialog.vue";
-import FormDialog from "~/components/FormDialog.vue";
-import TaskForm from "./tasks/TaskForm.vue";
-import ServerForm from "./servers/ServerForm.vue";
-import AppForm from "./apps/AppForm.vue";
+import DeleteDialog from "~/components/dialogs/DeleteDialog.vue";
+import FormDialog from "~/components/dialogs/FormDialog.vue";
+import TaskForm from "./forms/TaskForm.vue";
+import ServerForm from "./forms/ServerForm.vue";
+import AppForm from "./forms/AppForm.vue";
 
 export default {
   components: {

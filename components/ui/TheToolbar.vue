@@ -24,8 +24,13 @@
     <v-app-bar app>
       <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
       <NuxtLink to="/" class="text-decoration-none white--text pa-5">
-        <v-toolbar-title>Application</v-toolbar-title>
+        <v-toolbar-title>{{ $t("title") }}</v-toolbar-title>
       </NuxtLink>
+      <v-spacer></v-spacer>
+      <v-btn-toggle v-model="lang_toggle">
+        <v-btn @click="changeLang('pl')"> PL </v-btn>
+        <v-btn @click="changeLang('en')"> EN </v-btn>
+      </v-btn-toggle>
     </v-app-bar>
   </div>
 </template>
@@ -34,26 +39,34 @@
 export default {
   data() {
     return {
+      lang_toggle: null,
       drawer: false,
-      home: { icon: "mdi-home", title: "Home Page", to: "/" },
+      home: { icon: "mdi-home", title: this.$t("home"), to: "/" },
       items: [
         {
           icon: "mdi-server",
-          title: "Servers",
+          title: this.$t("servers"),
           to: "/servers",
         },
         {
           icon: "mdi-application-outline",
-          title: "Applications",
+          title: this.$t("apps"),
           to: "/apps",
         },
         {
           icon: "mdi-file-tree",
-          title: "Tasks",
+          title: this.$t("tasks"),
           to: "/tasks",
         },
       ],
     };
+  },
+  methods: {
+    changeLang(lang) {
+      this.$i18n.locale = lang;
+      this.$store.dispatch("setLang", lang);
+      // console.log(lang);
+    },
   },
 };
 </script>

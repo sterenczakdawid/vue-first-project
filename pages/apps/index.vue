@@ -5,17 +5,18 @@
       :items="filteredApps"
       :items-per-page="5"
       :search="search"
+      :footer-props="pagination"
       @click:row="handleClick"
     >
       <template v-slot:top>
         <v-toolbar flat>
-          <v-toolbar-title>Apps</v-toolbar-title>
+          <v-toolbar-title>{{ $t("apps") }}</v-toolbar-title>
           <v-divider class="mx-4" inset vertical></v-divider>
           <v-spacer></v-spacer>
           <v-text-field
             v-model="search"
             append-icon="mdi-magnify"
-            label="Search"
+            :label="$t('search')"
             single-line
             hide-details
           ></v-text-field>
@@ -25,13 +26,15 @@
             :items="servers"
             item-text="name"
             item-value="id"
-            label="Select server"
+            :label="$t('selectServer')"
             hide-details
             clearable
             class="maxw"
           ></v-select>
           <v-spacer></v-spacer>
-          <v-btn color="primary" @click="openDialog('add')">add new app</v-btn>
+          <v-btn color="primary" @click="openDialog('add')">{{
+            $t("addApp")
+          }}</v-btn>
           <form-dialog :dialog.sync="dialog" :mode="mode" :itemType="'app'">
             <app-form
               :initialData="editedItem"
@@ -62,10 +65,12 @@
 
 <script>
 import DataTable from "~/components/DataTable.vue";
-import DeleteDialog from "~/components/servers/DeleteDialog.vue";
-import FormDialog from "~/components/FormDialog.vue";
-import TaskForm from "~/components/tasks/TaskForm.vue";
-import AppForm from "~/components/apps/AppForm.vue";
+import DeleteDialog from "~/components/dialogs/DeleteDialog.vue";
+import FormDialog from "~/components/dialogs/FormDialog.vue";
+import TaskForm from "~/components/forms/TaskForm.vue";
+import AppForm from "~/components/forms/AppForm.vue";
+import { headers } from "~/constants/headers";
+import { pagination } from "~/constants/pagination";
 export default {
   components: {
     DeleteDialog,
@@ -76,6 +81,8 @@ export default {
   },
   data() {
     return {
+      headers: headers(this.$i18n),
+      pagination: pagination(this.$i18n),
       search: "",
       selectedServer: null,
       dialog: false,
@@ -157,6 +164,12 @@ export default {
       }
       this.dialog = false;
     },
+    localeChanged() {
+      this.headers = headers(this.$i18n);
+    },
+    setTVar() {
+      this.$i18n.locale = this.$store.getters.getLang;
+    },
   },
   computed: {
     servers() {
@@ -176,12 +189,18 @@ export default {
         return serverMatch && nameMatch;
       });
     },
-    headers() {
-      return this.$store.getters.getHeaders;
-    },
     editedItemName() {
       return this.editedItem.name;
     },
+  },
+  watch: {
+    "$i18n.locale": "localeChanged",
+    "$store.getters.getLang": "setTVar",
+  },
+  beforeRouteEnter(_, from, next) {
+    next((vm) => {
+      vm.setTVar();
+    });
   },
 };
 </script>

@@ -1,16 +1,3 @@
-<!-- <template>
-  <v-app dark>
-    <v-main>
-      <v-container>
-        <Nuxt />
-      </v-container>
-    </v-main>
-    <v-footer :absolute="!fixed" app>
-      <span>&copy; {{ new Date().getFullYear() }}</span>
-    </v-footer>
-  </v-app>
-</template>
--->
 <template>
   <v-app>
     <the-toolbar />
@@ -23,7 +10,7 @@
 </template>
 
 <script>
-import TheToolbar from "~/components/TheToolbar.vue";
+import TheToolbar from "~/components/ui/TheToolbar.vue";
 export default {
   components: {
     TheToolbar,

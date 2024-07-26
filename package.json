@@ -13,12 +13,14 @@
     "@nuxtjs/date-fns": "^0.0.3",
     "core-js": "^3.25.3",
     "nuxt": "^2.15.8",
+    "nuxt-i18n": "^6.28.1",
     "vue": "^2.7.10",
     "vue-server-renderer": "^2.7.10",
     "vue-template-compiler": "^2.7.10",
     "vuetify": "^2.6.10"
   },
   "devDependencies": {
+    "@nuxtjs/i18n": "^9.0.0-alpha.1",
     "@nuxtjs/vuetify": "^1.12.3"
   }
 }

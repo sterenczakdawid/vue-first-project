@@ -7,19 +7,17 @@
       @deleteItem="deleteItem"
     ></item-details>
     <p>
-      This task is attached to server:
+      {{ $t("taskAttachedServer") }}:
       <NuxtLink class="link" :to="`/servers/${serverId}`">{{
         serverName
       }}</NuxtLink>
     </p>
 
     <p v-if="appName">
-      This task is attached to application:
+      {{ $t("taskAttachedApp") }}:
       <NuxtLink class="link" :to="`/apps/${appId}`">{{ appName }}</NuxtLink>
     </p>
-    <p v-else class="font-italic">
-      This task is not attached to any application.
-    </p>
+    <p v-else class="font-italic">{{ $t("taskNotAttachedApp") }}.</p>
     <back-button />
     <form-dialog :dialog.sync="dialogEdit" :mode="'edit'" :itemType="'task'">
       <task-form
@@ -40,10 +38,10 @@
 </template>
 
 <script>
-import BackButton from "~/components/utils/BackButton.vue";
-import TaskForm from "~/components/tasks/TaskForm.vue";
-import FormDialog from "~/components/FormDialog.vue";
-import DeleteDialog from "~/components/servers/DeleteDialog.vue";
+import BackButton from "~/components/ui/BackButton.vue";
+import TaskForm from "~/components/forms/TaskForm.vue";
+import FormDialog from "~/components/dialogs/FormDialog.vue";
+import DeleteDialog from "~/components/dialogs/DeleteDialog.vue";
 import ItemDetails from "~/components/ui/ItemDetails.vue";
 export default {
   components: {
@@ -142,6 +140,17 @@ export default {
       this.selectedTask = { ...data };
       this.dialogEdit = false;
     },
+    setTVar() {
+      this.$i18n.locale = this.$store.getters.getLang;
+    },
+  },
+  watch: {
+    "$store.getters.getLang": "setTVar",
+  },
+  beforeRouteEnter(_, from, next) {
+    next((vm) => {
+      vm.setTVar();
+    });
   },
 };
 </script>

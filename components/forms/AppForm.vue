@@ -1,7 +1,7 @@
 <template>
   <v-form class="d-flex flex-column px-3" ref="form" lazy-validation>
     <v-text-field
-      label="Name"
+      :label="$t('headers.name')"
       v-model.trim="formData.name"
       :rules="nameRules"
       required
@@ -10,7 +10,7 @@
       v-model="formData.serverId"
       :items="servers"
       :rules="serversRules"
-      label="Server"
+      :label="$t('server')"
       item-text="name"
       item-value="id"
       required
@@ -18,7 +18,7 @@
     <v-select
       v-model="formData.tasksIds"
       :items="filteredTasks"
-      label="Tasks"
+      :label="$t('tasks')"
       multiple
       item-text="name"
       item-value="id"
@@ -26,8 +26,8 @@
       clearable
     ></v-select>
     <div class="align-self-end">
-      <v-btn @click="close"> Cancel </v-btn>
-      <v-btn class="success" @click="submit">Submit</v-btn>
+      <v-btn @click="close"> {{ $t("buttons.cancel") }} </v-btn>
+      <v-btn class="success" @click="submit">{{ $t("buttons.submit") }}</v-btn>
     </div>
   </v-form>
 </template>
@@ -40,10 +40,10 @@ export default {
     return {
       formData: this.createFormData(),
       nameRules: [
-        (v) => !!v.trim() || "Name is required",
-        (v) => v.trim().length >= 3 || "Name must have at least 3 characters",
+        (v) => !!v.trim() || this.$t("errors.nameRequired"),
+        (v) => v.trim().length >= 3 || this.$t("errors.nameTooShort"),
       ],
-      serversRules: [(v) => v > 0 || "Task has to be attached to a server"],
+      serversRules: [(v) => v > 0 || this.$t("errors.appAttachedToServer")],
     };
   },
   computed: {
@@ -70,8 +70,8 @@ export default {
     },
     noDataText() {
       return this.formData.serverId === -1
-        ? "Select a server to choose from its tasks"
-        : "Selected server has no tasks attached";
+        ? this.$t("noDataText.noServer")
+        : this.$t("noDataText.noServerTasks");
     },
   },
   methods: {

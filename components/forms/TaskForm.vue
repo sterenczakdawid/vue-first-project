@@ -3,14 +3,14 @@
     <v-text-field
       v-model.trim="formData.name"
       :rules="nameRules"
-      label="Name"
+      :label="$t('headers.name')"
       required
     ></v-text-field>
     <v-select
       v-model="formData.serverId"
       :items="servers"
       :rules="serversRules"
-      label="Server"
+      :label="$t('server')"
       item-text="name"
       item-value="id"
       required
@@ -18,15 +18,15 @@
     <v-select
       v-model="formData.appId"
       :items="filteredApps"
-      label="Application"
+      :label="$t('app')"
       item-text="name"
       item-value="id"
       :no-data-text="noDataText"
       clearable
     ></v-select>
     <div class="align-self-end">
-      <v-btn @click="close"> Cancel </v-btn>
-      <v-btn class="success" @click="submit">Submit</v-btn>
+      <v-btn @click="close"> {{ $t("buttons.cancel") }} </v-btn>
+      <v-btn class="success" @click="submit">{{ $t("buttons.submit") }}</v-btn>
     </div>
   </v-form>
 </template>
@@ -39,10 +39,10 @@ export default {
     return {
       formData: this.createFormData(),
       nameRules: [
-        (v) => !!v.trim() || "Name is required",
-        (v) => v.trim().length >= 3 || "Name must have at least 3 characters",
+        (v) => !!v.trim() || this.$t("errors.nameRequired"),
+        (v) => v.trim().length >= 3 || this.$t("errors.nameTooShort"),
       ],
-      serversRules: [(v) => v > 0 || "Task has to be attached to a server"],
+      serversRules: [(v) => v > 0 || this.$t("errors.taskAttachedToServer")],
     };
   },
   computed: {
@@ -57,8 +57,8 @@ export default {
     },
     noDataText() {
       return this.formData.serverId === -1
-        ? "Select a server to choose from its applications"
-        : "Selected server has no applications attached";
+        ? this.$t("noDataText.noServerApp")
+        : this.$t("noDataText.noServerApps");
     },
   },
   methods: {

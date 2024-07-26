@@ -1,5 +1,5 @@
 <template>
-  <v-btn @click="goBack">Back</v-btn>
+  <v-btn class="back-btn" @click="goBack">{{ $t("buttons.back") }}</v-btn>
 </template>
 
 <script>
@@ -11,3 +11,9 @@ export default {
   },
 };
 </script>
+
+<style>
+.back-btn {
+  margin-top: 10px;
+}
+</style>

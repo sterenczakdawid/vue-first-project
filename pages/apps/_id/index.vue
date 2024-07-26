@@ -7,7 +7,7 @@
       @deleteItem="deleteItem"
     ></item-details>
     <p>
-      This app is attached to server:
+      {{ $t("appAttached") }}:
       <NuxtLink class="link" :to="`/servers/${serverId}`">{{
         serverName
       }}</NuxtLink>
@@ -16,6 +16,7 @@
       :headers="headers"
       :items="filteredTasks"
       :items-per-page="5"
+      :footer-props="pagination"
       class="row-pointer"
       @click:row="handleClick"
     ></v-data-table>
@@ -38,11 +39,13 @@
 </template>
 
 <script>
-import BackButton from "~/components/utils/BackButton.vue";
+import BackButton from "~/components/ui/BackButton.vue";
 import ItemDetails from "~/components/ui/ItemDetails.vue";
-import AppForm from "~/components/apps/AppForm.vue";
-import FormDialog from "~/components/FormDialog.vue";
-import DeleteDialog from "~/components/servers/DeleteDialog.vue";
+import AppForm from "~/components/forms/AppForm.vue";
+import FormDialog from "~/components/dialogs/FormDialog.vue";
+import DeleteDialog from "~/components/dialogs/DeleteDialog.vue";
+import { detailsHeaders } from "~/constants/headers";
+import { pagination } from "~/constants/pagination";
 export default {
   components: {
     BackButton,
@@ -53,6 +56,8 @@ export default {
   },
   data() {
     return {
+      pagination: pagination(this.$i18n),
+      headers: detailsHeaders(this.$i18n),
       selectedApp: null,
       id: this.$route.params.id,
       editedItem: {},
@@ -61,9 +66,6 @@ export default {
     };
   },
   computed: {
-    headers() {
-      return this.$store.getters.getHeaders;
-    },
     servers() {
       return this.$store.getters["modules/servers/servers"];
     },
@@ -129,11 +131,26 @@ export default {
       this.selectedApp = { ...data };
       this.dialogEdit = false;
     },
+    localeChanged() {
+      this.headers = detailsHeaders(this.$i18n);
+    },
+    setTVar() {
+      this.$i18n.locale = this.$store.getters.getLang;
+    },
   },
   created() {
     this.selectedApp = this.$store.getters["modules/apps/apps"].find(
       (app) => app.id == this.id
     );
+  },
+  watch: {
+    "$i18n.locale": "localeChanged",
+    "$store.getters.getLang": "setTVar",
+  },
+  beforeRouteEnter(_, from, next) {
+    next((vm) => {
+      vm.setTVar();
+    });
   },
 };
 </script>

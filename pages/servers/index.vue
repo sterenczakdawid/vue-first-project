@@ -5,25 +5,26 @@
       :items="filteredServers"
       :items-per-page="5"
       :search="search"
+      :footer-props="pagination"
       v-if="hasServers"
       @click:row="handleClick"
     >
       <template v-slot:top>
         <v-toolbar flat>
-          <v-toolbar-title>Servers</v-toolbar-title>
+          <v-toolbar-title>{{ $t("servers") }}</v-toolbar-title>
           <v-divider class="mx-4" inset vertical></v-divider>
           <v-spacer></v-spacer>
           <v-text-field
             v-model="search"
             append-icon="mdi-magnify"
-            label="Search"
+            :label="$t('search')"
             single-line
             hide-details
           ></v-text-field>
           <v-spacer></v-spacer>
-          <v-btn color="primary" @click="openDialog('add')"
-            >add new server</v-btn
-          >
+          <v-btn color="primary" @click="openDialog('add')">{{
+            $t("addServer")
+          }}</v-btn>
           <form-dialog :dialog.sync="dialog" :mode="mode" :itemType="'server'">
             <server-form
               :initialData="editedItem"
@@ -65,9 +66,11 @@
 </template>
 
 <script>
-import DeleteDialog from "~/components/servers/DeleteDialog.vue";
-import FormDialog from "~/components/FormDialog.vue";
-import ServerForm from "~/components/servers/ServerForm.vue";
+import DeleteDialog from "~/components/dialogs/DeleteDialog.vue";
+import FormDialog from "~/components/dialogs/FormDialog.vue";
+import ServerForm from "~/components/forms/ServerForm.vue";
+import { headers } from "~/constants/headers";
+import { pagination } from "~/constants/pagination";
 export default {
   components: {
     DeleteDialog,
@@ -76,6 +79,8 @@ export default {
   },
   data() {
     return {
+      pagination: pagination(this.$i18n),
+      headers: headers(this.$i18n),
       search: "",
       dialog: false,
       mode: "add",
@@ -152,6 +157,12 @@ export default {
       this.mode = mode;
       this.dialog = true;
     },
+    localeChanged() {
+      this.headers = headers(this.$i18n);
+    },
+    setTVar() {
+      this.$i18n.locale = this.$store.getters.getLang;
+    },
   },
   computed: {
     servers() {
@@ -166,12 +177,18 @@ export default {
         server.name.toLowerCase().includes(searchLower)
       );
     },
-    headers() {
-      return this.$store.getters.getHeaders;
-    },
     editedItemName() {
       return this.editedItem.name;
     },
+  },
+  watch: {
+    "$i18n.locale": "localeChanged",
+    "$store.getters.getLang": "setTVar",
+  },
+  beforeRouteEnter(_, from, next) {
+    next((vm) => {
+      vm.setTVar();
+    });
   },
 };
 </script>

@@ -5,17 +5,18 @@
       :items="filteredTasks"
       :items-per-page="5"
       :search="search"
+      :footer-props="pagination"
       @click:row="handleClick"
     >
       <template v-slot:top>
         <v-toolbar flat>
-          <v-toolbar-title>Tasks</v-toolbar-title>
+          <v-toolbar-title>{{ $t("tasks") }}</v-toolbar-title>
           <v-divider class="mx-4" inset vertical></v-divider>
           <v-spacer></v-spacer>
           <v-text-field
             v-model="search"
             append-icon="mdi-magnify"
-            label="Search"
+            :label="$t('search')"
             single-line
             hide-details
           ></v-text-field>
@@ -25,7 +26,7 @@
             :items="servers"
             item-text="name"
             item-value="id"
-            label="Select server"
+            :label="$t('selectServer')"
             hide-details
             clearable
             class="lol"
@@ -36,14 +37,16 @@
             :items="filteredApps"
             item-text="name"
             item-value="id"
-            label="Select app"
+            :label="$t('selectApp')"
             hide-details
             single-line
             class="lol"
             clearable
           ></v-select>
           <v-spacer></v-spacer>
-          <v-btn color="primary" @click="openDialog('add')">add new task</v-btn>
+          <v-btn color="primary" @click="openDialog('add')">{{
+            $t("addTask")
+          }}</v-btn>
           <form-dialog :dialog.sync="dialog" :mode="mode" :itemType="'task'">
             <task-form
               :initialData="editedItem"
@@ -84,20 +87,22 @@
 
 <script>
 import DataTable from "~/components/DataTable.vue";
-import DeleteDialog from "~/components/servers/DeleteDialog.vue";
-import FormDialog from "~/components/FormDialog.vue";
-import TaskForm from "~/components/tasks/TaskForm.vue";
-import TaskFormDialog from "~/components/tasks/TaskFormDialog.vue";
+import DeleteDialog from "~/components/dialogs/DeleteDialog.vue";
+import FormDialog from "~/components/dialogs/FormDialog.vue";
+import TaskForm from "~/components/forms/TaskForm.vue";
+import { headers } from "~/constants/headers";
+import { pagination } from "~/constants/pagination";
 export default {
   components: {
     DeleteDialog,
     FormDialog,
     TaskForm,
     DataTable,
-    TaskFormDialog,
   },
   data() {
     return {
+      pagination: pagination(this.$i18n),
+      headers: headers(this.$i18n),
       search: "",
       selectedServer: null,
       selectedApp: null,
@@ -180,6 +185,12 @@ export default {
       }
       this.dialog = false;
     },
+    localeChanged() {
+      this.headers = headers(this.$i18n);
+    },
+    setTVar() {
+      this.$i18n.locale = this.$store.getters.getLang;
+    },
   },
   computed: {
     servers() {
@@ -190,9 +201,6 @@ export default {
     },
     tasks() {
       return this.$store.getters["modules/tasks/tasks"];
-    },
-    headers() {
-      return this.$store.getters.getHeaders;
     },
     editedItemName() {
       return this.editedItem.name;
@@ -216,6 +224,15 @@ export default {
         ? this.apps.filter((app) => app.serverId === this.selectedServer)
         : this.apps;
     },
+  },
+  watch: {
+    "$i18n.locale": "localeChanged",
+    "$store.getters.getLang": "setTVar",
+  },
+  beforeRouteEnter(_, from, next) {
+    next((vm) => {
+      vm.setTVar();
+    });
   },
 };
 </script>

@@ -7,8 +7,8 @@
       @deleteItem="deleteItem"
     ></item-details>
     <v-tabs v-model="tab" grow>
-      <v-tab>Applications</v-tab>
-      <v-tab>Tasks</v-tab>
+      <v-tab>{{ $t("apps") }}</v-tab>
+      <v-tab>{{ $t("tasks") }}</v-tab>
     </v-tabs>
     <v-tabs-items v-model="tab">
       <v-tab-item>
@@ -16,6 +16,7 @@
           :headers="headers"
           :items="filteredApps"
           :items-per-page="5"
+          :footer-props="pagination"
           class="row-pointer"
           @click:row="handleClickApp"
         ></v-data-table
@@ -25,6 +26,7 @@
           :headers="headers"
           :items="filteredTasks"
           :items-per-page="5"
+          :footer-props="pagination"
           class="row-pointer"
           @click:row="handleClick"
         ></v-data-table
@@ -52,11 +54,13 @@
 </template>
 
 <script>
-import BackButton from "~/components/utils/BackButton.vue";
-import DeleteDialog from "~/components/servers/DeleteDialog.vue";
-import ServerFormDialog from "~/components/FormDialog.vue";
-import ServerForm from "~/components/servers/ServerForm.vue";
+import BackButton from "~/components/ui/BackButton.vue";
+import DeleteDialog from "~/components/dialogs/DeleteDialog.vue";
+import ServerFormDialog from "~/components/dialogs/FormDialog.vue";
+import ServerForm from "~/components/forms/ServerForm.vue";
 import ItemDetails from "~/components/ui/ItemDetails.vue";
+import { detailsHeaders } from "~/constants/headers";
+import { pagination } from "~/constants/pagination";
 export default {
   components: {
     BackButton,
@@ -67,6 +71,8 @@ export default {
   },
   data() {
     return {
+      pagination: pagination(this.$i18n),
+      headers: detailsHeaders(this.$i18n),
       dialogDelete: false,
       dialogEdit: false,
       editedItem: {},
@@ -93,9 +99,6 @@ export default {
       return this.tasks.filter(
         (task) => task.serverId === this.selectedServer.id
       );
-    },
-    headers() {
-      return this.$store.getters.getHeaders;
     },
     apps() {
       return this.$store.getters["modules/apps/apps"];
@@ -164,11 +167,26 @@ export default {
         this.dialogDelete = false;
       }
     },
+    localeChanged() {
+      this.headers = detailsHeaders(this.$i18n);
+    },
+    setTVar() {
+      this.$i18n.locale = this.$store.getters.getLang;
+    },
   },
   created() {
     this.selectedServer = this.$store.getters["modules/servers/servers"].find(
       (server) => server.id == this.id
     );
+  },
+  watch: {
+    "$i18n.locale": "localeChanged",
+    "$store.getters.getLang": "setTVar",
+  },
+  beforeRouteEnter(_, from, next) {
+    next((vm) => {
+      vm.setTVar();
+    });
   },
 };
 </script>

@@ -1,20 +1,21 @@
 export const state = () => ({
-  headers: [
-    {
-      text: "ID",
-      align: "start",
-      sortable: false,
-      value: "id",
-    },
-    { text: "Name", value: "name" },
-    { text: "Created", value: "created" },
-    { text: "Edited", value: "edited" },
-    { text: "Actions", value: "actions", sortable: false },
-  ],
+  lang: "pl",
 });
 
 export const getters = {
-  getHeaders(state) {
-    return state.headers;
+  getLang(state) {
+    return state.lang;
+  },
+};
+
+export const mutations = {
+  setLang(state, lang) {
+    state.lang = lang;
+  },
+};
+
+export const actions = {
+  setLang(context, lang) {
+    context.commit("setLang", lang);
   },
 };

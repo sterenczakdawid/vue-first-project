@@ -1,14 +1,14 @@
 <template>
   <div class="home-container">
-    <h2>Home Page</h2>
+    <h2>{{ $t("home") }}</h2>
     <NuxtLink to="/servers">
-      <v-btn color="primary" width="200px">Servers</v-btn>
+      <v-btn color="primary" width="200px">{{ $t("servers") }}</v-btn>
     </NuxtLink>
     <NuxtLink to="/apps">
-      <v-btn color="primary" width="200px">Applications</v-btn>
+      <v-btn color="primary" width="200px">{{ $t("apps") }}</v-btn>
     </NuxtLink>
     <NuxtLink to="/tasks">
-      <v-btn color="primary" width="200px">Tasks</v-btn>
+      <v-btn color="primary" width="200px">{{ $t("tasks") }}</v-btn>
     </NuxtLink>
   </div>
 </template>

@@ -1,14 +1,14 @@
 <template>
   <v-form class="d-flex flex-column px-3" ref="form">
     <v-text-field
-      label="Name"
+      :label="$t('headers.name')"
       v-model.trim="formData.name"
       :rules="nameRules"
       required
     ></v-text-field>
     <div class="align-self-end">
-      <v-btn @click="close"> Cancel </v-btn>
-      <v-btn class="success" @click="submit">Submit</v-btn>
+      <v-btn @click="close"> {{ $t("buttons.cancel") }} </v-btn>
+      <v-btn class="success" @click="submit">{{ $t("buttons.submit") }}</v-btn>
     </div>
   </v-form>
 </template>
@@ -21,8 +21,8 @@ export default {
     return {
       formData: this.createFormData(),
       nameRules: [
-        (v) => !!v || "Name is required",
-        (v) => v.length >= 3 || "Name must have at least 3 characters",
+        (v) => !!v || this.$t("errors.nameRequired"),
+        (v) => v.length >= 3 || this.$t("errors.nameTooShort"),
       ],
     };
   },
