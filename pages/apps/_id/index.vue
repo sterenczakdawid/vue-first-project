@@ -133,6 +133,7 @@ export default {
     },
     localeChanged() {
       this.headers = detailsHeaders(this.$i18n);
+      this.pagination = pagination(this.$i18n);
     },
     setTVar() {
       this.$i18n.locale = this.$store.getters.getLang;

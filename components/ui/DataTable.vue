@@ -118,9 +118,9 @@ export default {
 <script>
 import DeleteDialog from "~/components/dialogs/DeleteDialog.vue";
 import FormDialog from "~/components/dialogs/FormDialog.vue";
-import TaskForm from "./forms/TaskForm.vue";
-import ServerForm from "./forms/ServerForm.vue";
-import AppForm from "./forms/AppForm.vue";
+import TaskForm from "../forms/TaskForm.vue";
+import ServerForm from "../forms/ServerForm.vue";
+import AppForm from "../forms/AppForm.vue";
 
 export default {
   components: {

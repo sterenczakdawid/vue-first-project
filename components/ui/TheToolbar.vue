@@ -65,7 +65,6 @@ export default {
     changeLang(lang) {
       this.$i18n.locale = lang;
       this.$store.dispatch("setLang", lang);
-      // console.log(lang);
     },
   },
 };

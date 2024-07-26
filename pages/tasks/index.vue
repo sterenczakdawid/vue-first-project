@@ -86,7 +86,7 @@
 </template>
 
 <script>
-import DataTable from "~/components/DataTable.vue";
+import DataTable from "~/components/ui/DataTable.vue";
 import DeleteDialog from "~/components/dialogs/DeleteDialog.vue";
 import FormDialog from "~/components/dialogs/FormDialog.vue";
 import TaskForm from "~/components/forms/TaskForm.vue";
@@ -187,6 +187,7 @@ export default {
     },
     localeChanged() {
       this.headers = headers(this.$i18n);
+      this.pagination = pagination(this.$i18n);
     },
     setTVar() {
       this.$i18n.locale = this.$store.getters.getLang;
