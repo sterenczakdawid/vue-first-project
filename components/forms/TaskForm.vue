@@ -53,17 +53,17 @@ export default {
     tasks() {
       return this.$store.getters["modules/tasks/tasks"];
     },
-  },
-  filteredApps() {
-    return this.apps.filter((app) => app.serverId == this.formData.serverId);
-  },
-  servers() {
-    return this.$store.getters["modules/servers/servers"];
-  },
-  noDataText() {
-    return this.formData.serverId === -1
-      ? this.$t("noDataText.noServerApp")
-      : this.$t("noDataText.noServerApps");
+    filteredApps() {
+      return this.apps.filter((app) => app.serverId == this.formData.serverId);
+    },
+    servers() {
+      return this.$store.getters["modules/servers/servers"];
+    },
+    noDataText() {
+      return this.formData.serverId === -1
+        ? this.$t("noDataText.noServerApp")
+        : this.$t("noDataText.noServerApps");
+    },
   },
   methods: {
     createFormData() {
