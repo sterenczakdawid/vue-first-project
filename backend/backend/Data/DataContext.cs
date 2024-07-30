@@ -11,5 +11,19 @@ namespace backend.Data
     }
 
     public DbSet<MyTask> Tasks { get; set; }
+    public DbSet<App> Apps { get; set; }
+    public DbSet<Server> Servers { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+      modelBuilder.Entity<MyTask>()
+        .Property(r => r.Name)
+        .IsRequired()
+        .HasMaxLength(25);
+
+      modelBuilder.Entity<App>()
+        .Property(r => r.Name)
+        .IsRequired();
+    }
   }
 }
