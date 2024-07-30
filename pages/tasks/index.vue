@@ -72,6 +72,16 @@
         </v-icon>
       </template>
     </v-data-table>
+    <!-- <data-table
+      :items="tasks"
+      :itemType="'task'"
+      :title="'Tasks'"
+      @submit="submit"
+      @openDialog="openDialog"
+      @editItem="editItem"
+      @deleteItem="deleteItem"
+    >
+    </data-table> -->
   </div>
 </template>
 
