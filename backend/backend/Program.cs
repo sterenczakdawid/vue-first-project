@@ -14,7 +14,13 @@ builder.Services.AddDbContext<DataContext>(options =>
 {
   options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
+
 var app = builder.Build();
+using (var scope = app.Services.CreateScope())
+{
+  var services = scope.ServiceProvider;
+  DataSeeder.Initialize(services);
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

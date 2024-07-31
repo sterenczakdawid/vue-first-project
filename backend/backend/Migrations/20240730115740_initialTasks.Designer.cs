@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using backend.Data;
 
@@ -10,9 +11,11 @@ using backend.Data;
 namespace backend.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20240730115740_initialTasks")]
+    partial class initialTasks
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -46,7 +49,7 @@ namespace backend.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Apps", (string)null);
+                    b.ToTable("Apps");
                 });
 
             modelBuilder.Entity("backend.Entities.MyTask", b =>
@@ -78,7 +81,27 @@ namespace backend.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Tasks", (string)null);
+                    b.ToTable("Tasks");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            AppId = 0,
+                            Created = "xxx",
+                            Edited = "xxx",
+                            Name = "Task 1",
+                            ServerId = 0
+                        },
+                        new
+                        {
+                            Id = 2,
+                            AppId = 0,
+                            Created = "yyy",
+                            Edited = "yyy",
+                            Name = "Task 2",
+                            ServerId = 0
+                        });
                 });
 
             modelBuilder.Entity("backend.Entities.Server", b =>
@@ -103,7 +126,7 @@ namespace backend.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Servers", (string)null);
+                    b.ToTable("Servers");
                 });
 #pragma warning restore 612, 618
         }
