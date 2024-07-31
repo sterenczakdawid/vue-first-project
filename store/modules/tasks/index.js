@@ -1,4 +1,4 @@
-import tasks from "data/tasks.json";
+// import tasks from "data/tasks.json";
 export const state = () => ({
-  tasks: tasks,
+  tasks: [],
 });

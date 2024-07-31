@@ -174,8 +174,14 @@ export default {
     setTVar() {
       this.$i18n.locale = this.$store.getters.getLang;
     },
+    loadTasks() {
+      this.$store.dispatch("modules/servers/loadServers");
+      this.$store.dispatch("modules/tasks/loadTasks");
+      // this.$store.dispatch("modules/apps/loadApps");
+    },
   },
-  created() {
+  async created() {
+    this.loadTasks();
     this.selectedServer = this.$store.getters["modules/servers/servers"].find(
       (server) => server.id == this.id
     );

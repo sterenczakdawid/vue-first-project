@@ -11,4 +11,7 @@ export default {
   updateServer(state, { index, item }) {
     state.servers.splice(index, 1, item);
   },
+  setServers(state, payload) {
+    state.servers = payload;
+  },
 };

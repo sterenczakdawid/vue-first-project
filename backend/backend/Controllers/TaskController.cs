@@ -1,5 +1,6 @@
 using backend.Data;
 using backend.Entities;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -17,6 +18,7 @@ namespace backend.Controllers
       _context = context;
     }
 
+    [EnableCors("AllowAllOrigins")]
     [HttpGet]
     public async Task<ActionResult<List<MyTask>>> GetAllTasks()
     {
@@ -25,6 +27,7 @@ namespace backend.Controllers
       return Ok(tasks);
     }
 
+    [EnableCors("AllowAllOrigins")]
     [HttpGet("{id}")]
     public async Task<ActionResult<MyTask>> GetTask(int id)
     {
@@ -37,6 +40,7 @@ namespace backend.Controllers
       return Ok(task);
     }
 
+    [EnableCors("AllowAllOrigins")]
     [HttpPost]
     public async Task<ActionResult<List<MyTask>>> AddTask(MyTask task)
     {
@@ -46,6 +50,7 @@ namespace backend.Controllers
       return Ok(await _context.Tasks.ToListAsync());
     }
 
+    [EnableCors("AllowAllOrigins")]
     [HttpPut]
     public async Task<ActionResult<List<MyTask>>> UpdateTask(MyTask updatedTask)
     {
@@ -62,6 +67,7 @@ namespace backend.Controllers
       return Ok(await _context.Tasks.ToListAsync());
     }
 
+    [EnableCors("AllowAllOrigins")]
     [HttpDelete]
     public async Task<ActionResult<List<MyTask>>> DeleteTask(int id)
     {

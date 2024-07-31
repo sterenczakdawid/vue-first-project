@@ -95,11 +95,10 @@ export default {
     },
   },
   created() {
+    this.loadTasks();
     this.selectedTask = this.$store.getters["modules/tasks/tasks"].find(
       (task) => task.id == this.id
     );
-    console.log(this.appId);
-    // console.log(this.tasks.indexOf(this.selectedTask));
   },
   methods: {
     editItem() {
@@ -107,6 +106,8 @@ export default {
       this.dialogEdit = true;
     },
     deleteItem() {
+      console.log(this.servers);
+      console.log(this.selectedTask);
       this.dialogDelete = true;
     },
     deleteItemConfirm() {
@@ -142,6 +143,10 @@ export default {
     },
     setTVar() {
       this.$i18n.locale = this.$store.getters.getLang;
+    },
+    loadTasks() {
+      this.$store.dispatch("modules/servers/loadServers");
+      this.$store.dispatch("modules/tasks/loadTasks");
     },
   },
   watch: {

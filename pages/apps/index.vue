@@ -174,6 +174,11 @@ export default {
     setTVar() {
       this.$i18n.locale = this.$store.getters.getLang;
     },
+    loadApps() {
+      this.$store.dispatch("modules/apps/loadApps");
+      this.$store.dispatch("modules/tasks/loadTasks");
+      this.$store.dispatch("modules/servers/loadServers");
+    },
   },
   computed: {
     servers() {
@@ -205,6 +210,9 @@ export default {
     next((vm) => {
       vm.setTVar();
     });
+  },
+  created() {
+    this.loadApps();
   },
 };
 </script>

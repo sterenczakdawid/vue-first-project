@@ -12,4 +12,7 @@ export default {
   removeServerApps(state, serverId) {
     state.apps = state.apps.filter((app) => app.serverId != serverId);
   },
+  setApps(state, payload) {
+    state.apps = payload;
+  },
 };

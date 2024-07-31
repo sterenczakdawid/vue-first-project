@@ -1,3 +1,5 @@
+import axios from "axios";
+
 export default {
   addServer(context, server) {
     const serverData = {
@@ -22,5 +24,10 @@ export default {
   updateServer(context, serverData) {
     const { index, item } = serverData;
     context.commit("updateServer", { index, item });
+  },
+  async loadServers(context) {
+    const response = await axios.get("https://localhost:7233/api/Server");
+    // console.log(response.data);
+    context.commit("setServers", response.data);
   },
 };

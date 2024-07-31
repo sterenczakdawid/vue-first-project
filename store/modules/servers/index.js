@@ -1,4 +1,5 @@
-import servers from "data/servers.json";
+// import servers from "data/servers.json";
 export const state = () => ({
-  servers: servers,
+  servers: [],
+  // servers: servers,
 });

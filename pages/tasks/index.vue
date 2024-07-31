@@ -28,8 +28,8 @@
             item-value="id"
             :label="$t('selectServer')"
             hide-details
+            single-line
             clearable
-            class="lol"
           ></v-select>
           <v-spacer></v-spacer>
           <v-select
@@ -128,6 +128,7 @@ export default {
   },
   methods: {
     handleClick(item) {
+      console.log(item);
       this.$router.push(this.$route.path + "/" + item.id);
     },
     deleteItemConfirm(index) {
@@ -192,6 +193,10 @@ export default {
     setTVar() {
       this.$i18n.locale = this.$store.getters.getLang;
     },
+    loadTasks() {
+      this.$store.dispatch("modules/servers/loadServers");
+      this.$store.dispatch("modules/tasks/loadTasks");
+    },
   },
   computed: {
     servers() {
@@ -234,6 +239,9 @@ export default {
     next((vm) => {
       vm.setTVar();
     });
+  },
+  created() {
+    this.loadTasks();
   },
 };
 </script>

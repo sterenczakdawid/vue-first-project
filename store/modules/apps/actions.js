@@ -1,3 +1,5 @@
+import axios from "axios";
+
 export default {
   addApp(context, app) {
     const appData = {
@@ -25,5 +27,10 @@ export default {
   },
   removeServerApps(context, serverId) {
     context.commit("removeServerApps", serverId);
+  },
+  async loadApps(context) {
+    const response = await axios.get("https://localhost:7233/api/App");
+    // console.log(response.data);
+    context.commit("setApps", response.data);
   },
 };
