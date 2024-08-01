@@ -16,7 +16,7 @@
           :headers="headers"
           :items="filteredApps"
           :items-per-page="5"
-          :footer-props="pagination"
+          :footer-props="footer"
           class="row-pointer"
           @click:row="handleClickApp"
         ></v-data-table
@@ -26,7 +26,7 @@
           :headers="headers"
           :items="filteredTasks"
           :items-per-page="5"
-          :footer-props="pagination"
+          :footer-props="footer"
           class="row-pointer"
           @click:row="handleClick"
         ></v-data-table
@@ -60,7 +60,7 @@ import ServerFormDialog from "~/components/dialogs/FormDialog.vue";
 import ServerForm from "~/components/forms/ServerForm.vue";
 import ItemDetails from "~/components/ui/ItemDetails.vue";
 import { detailsHeaders } from "~/constants/headers";
-import { pagination } from "~/constants/pagination";
+import { footer } from "~/constants/footer";
 export default {
   components: {
     BackButton,
@@ -71,7 +71,7 @@ export default {
   },
   data() {
     return {
-      pagination: pagination(this.$i18n),
+      footer: footer(this.$i18n),
       headers: detailsHeaders(this.$i18n),
       dialogDelete: false,
       dialogEdit: false,
@@ -169,7 +169,7 @@ export default {
     },
     localeChanged() {
       this.headers = detailsHeaders(this.$i18n);
-      this.pagination = pagination(this.$i18n);
+      this.footer = footer(this.$i18n);
     },
     setTVar() {
       this.$i18n.locale = this.$store.getters.getLang;

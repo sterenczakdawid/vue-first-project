@@ -16,16 +16,16 @@ namespace backend.Data
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-      modelBuilder.Entity<Server>()
-        .Property(s => s.Id)
-        .ValueGeneratedNever();
-
       modelBuilder.Entity<MyTask>()
         .Property(r => r.Name)
         .IsRequired()
         .HasMaxLength(25);
 
       modelBuilder.Entity<App>()
+        .Property(r => r.Name)
+        .IsRequired();
+
+      modelBuilder.Entity<Server>()
         .Property(r => r.Name)
         .IsRequired();
     }

@@ -16,7 +16,7 @@ export default {
     const { index, item } = taskData;
     context.commit("updateTask", { index, item });
   },
-  removeTask(context, taskId) {
+  async removeTask(context, taskId) {
     context.commit("removeTask", parseInt(taskId));
   },
   removeServerTasks(context, serverId) {

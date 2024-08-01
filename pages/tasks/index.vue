@@ -5,63 +5,55 @@
       :items="filteredTasks"
       :items-per-page="5"
       :search="search"
-      :footer-props="pagination"
+      :footer-props="footer"
       @click:row="handleClick"
     >
       <template v-slot:top>
-        <v-toolbar flat>
-          <v-toolbar-title>{{ $t("tasks") }}</v-toolbar-title>
-          <v-divider class="mx-4" inset vertical></v-divider>
-          <v-spacer></v-spacer>
-          <v-text-field
-            v-model="search"
-            append-icon="mdi-magnify"
-            :label="$t('search')"
-            single-line
-            hide-details
-          ></v-text-field>
-          <v-spacer></v-spacer>
-          <v-select
-            v-model="selectedServer"
-            :items="servers"
-            item-text="name"
-            item-value="id"
-            :label="$t('selectServer')"
-            hide-details
-            single-line
-            clearable
-          ></v-select>
-          <v-spacer></v-spacer>
-          <v-select
-            v-model="selectedApp"
-            :items="filteredApps"
-            item-text="name"
-            item-value="id"
-            :label="$t('selectApp')"
-            hide-details
-            single-line
-            class="lol"
-            clearable
-          ></v-select>
-          <v-spacer></v-spacer>
-          <v-btn color="primary" @click="openDialog('add')">{{
-            $t("addTask")
-          }}</v-btn>
-          <form-dialog :dialog.sync="dialog" :mode="mode" :itemType="'task'">
-            <task-form
-              :initialData="editedItem"
-              @close="close"
-              @submit="submit"
-            ></task-form>
-          </form-dialog>
-          <delete-dialog
-            :dialog.sync="dialogDelete"
-            :itemName="editedItemName"
-            :itemType="'task'"
-            @confirm-delete="deleteItemConfirm"
-            @cancel-delete="closeDelete"
-          />
-        </v-toolbar>
+        <table-toolbar
+          :title="$t('tasks')"
+          :search.sync="search"
+          :buttonText="$t('addTask')"
+          :openDialog="openDialog"
+        >
+          <template v-slot:filters>
+            <v-select
+              v-model="selectedServer"
+              :items="servers"
+              item-text="name"
+              item-value="id"
+              :label="$t('selectServer')"
+              hide-details
+              single-line
+              clearable
+            ></v-select>
+            <v-spacer></v-spacer>
+            <v-select
+              v-model="selectedApp"
+              :items="filteredApps"
+              item-text="name"
+              item-value="id"
+              :label="$t('selectApp')"
+              hide-details
+              single-line
+              class="lol"
+              clearable
+            ></v-select>
+          </template>
+        </table-toolbar>
+        <form-dialog :dialog.sync="dialog" :mode="mode" :itemType="'task'">
+          <task-form
+            :initialData="editedItem"
+            @close="close"
+            @submit="submit"
+          ></task-form>
+        </form-dialog>
+        <delete-dialog
+          :dialog.sync="dialogDelete"
+          :itemName="editedItemName"
+          :itemType="'task'"
+          @confirm-delete="deleteItemConfirm"
+          @cancel-delete="closeDelete"
+        />
       </template>
       <template v-slot:[`item.actions`]="{ item }">
         <v-icon small class="pa-2 mr-2" @click.stop="editItem(item)">
@@ -72,127 +64,33 @@
         </v-icon>
       </template>
     </v-data-table>
-    <!-- <data-table
-      :items="tasks"
-      :itemType="'task'"
-      :title="'Tasks'"
-      @submit="submit"
-      @openDialog="openDialog"
-      @editItem="editItem"
-      @deleteItem="deleteItem"
-    >
-    </data-table> -->
   </div>
 </template>
 
 <script>
-import DataTable from "~/components/ui/DataTable.vue";
 import DeleteDialog from "~/components/dialogs/DeleteDialog.vue";
 import FormDialog from "~/components/dialogs/FormDialog.vue";
 import TaskForm from "~/components/forms/TaskForm.vue";
-import { headers } from "~/constants/headers";
-import { pagination } from "~/constants/pagination";
+import TableToolbar from "~/components/ui/DataTable/TableToolbar.vue";
+import { LocaleMixin } from "~/mixins/LocaleMixin";
+import { CrudMixin } from "~/mixins/CrudMixin";
 export default {
   components: {
     DeleteDialog,
     FormDialog,
     TaskForm,
-    DataTable,
+    TableToolbar,
   },
+  mixins: [CrudMixin, LocaleMixin],
   data() {
     return {
-      pagination: pagination(this.$i18n),
-      headers: headers(this.$i18n),
-      search: "",
+      module: "tasks",
+      itemType: "Task",
       selectedServer: null,
       selectedApp: null,
-      dialog: false,
-      mode: "add",
-      dialogDelete: false,
-      editedIndex: -1,
-      editedItem: {
-        name: "",
-        created: null,
-        edited: null,
-        serverId: -1,
-        appId: -1,
-      },
-      defaultItem: {
-        name: "",
-        created: null,
-        edited: null,
-        serverId: -1,
-        appId: -1,
-      },
     };
   },
   methods: {
-    handleClick(item) {
-      console.log(item);
-      this.$router.push(this.$route.path + "/" + item.id);
-    },
-    deleteItemConfirm(index) {
-      this.$store.dispatch("modules/tasks/removeTask", index);
-    },
-    editItem(item) {
-      this.mode = "edit";
-      this.editedIndex = this.tasks.indexOf(item);
-      this.editedItem = Object.assign({}, item);
-      this.dialog = true;
-    },
-    deleteItem(item) {
-      this.editedIndex = item.id;
-      this.editedItem = Object.assign({}, item);
-      this.dialogDelete = true;
-    },
-    deleteItemConfirm() {
-      this.$store.dispatch("modules/tasks/removeTask", this.editedIndex);
-      this.closeDelete();
-    },
-    closeDelete() {
-      this.dialogDelete = false;
-      this.$nextTick(() => {
-        this.editedItem = Object.assign({}, this.defaultItem);
-        this.editedIndex = -1;
-      });
-    },
-    close() {
-      this.dialog = false;
-      this.$nextTick(() => {
-        this.editedItem = Object.assign({}, this.defaultItem);
-        this.editedIndex = -1;
-      });
-    },
-    openDialog(mode) {
-      this.mode = mode;
-      this.dialog = true;
-    },
-    submit(formData) {
-      const data = {
-        ...formData,
-        edited: new Date().toLocaleString(),
-      };
-      console.log(formData);
-      if (!formData.created) {
-        data.created = new Date().toLocaleString();
-      }
-      if (this.editedIndex > -1) {
-        this.$store.dispatch("modules/tasks/updateTask", {
-          index: this.editedIndex,
-          item: data,
-        });
-      } else {
-        this.$store.dispatch("modules/tasks/addTask", data);
-      }
-      this.dialog = false;
-    },
-    localeChanged() {
-      this.headers = headers(this.$i18n);
-      this.pagination = pagination(this.$i18n);
-    },
-    setTVar() {
-      this.$i18n.locale = this.$store.getters.getLang;
-    },
     loadTasks() {
       this.$store.dispatch("modules/servers/loadServers");
       this.$store.dispatch("modules/tasks/loadTasks");
@@ -207,9 +105,6 @@ export default {
     },
     tasks() {
       return this.$store.getters["modules/tasks/tasks"];
-    },
-    editedItemName() {
-      return this.editedItem.name;
     },
     filteredTasks() {
       return this.tasks.filter((task) => {
@@ -230,15 +125,6 @@ export default {
         ? this.apps.filter((app) => app.serverId === this.selectedServer)
         : this.apps;
     },
-  },
-  watch: {
-    "$i18n.locale": "localeChanged",
-    "$store.getters.getLang": "setTVar",
-  },
-  beforeRouteEnter(_, from, next) {
-    next((vm) => {
-      vm.setTVar();
-    });
   },
   created() {
     this.loadTasks();

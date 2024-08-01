@@ -5,41 +5,31 @@
       :items="filteredServers"
       :items-per-page="5"
       :search="search"
-      :footer-props="pagination"
+      :footer-props="footer"
       v-if="hasServers"
       @click:row="handleClick"
     >
       <template v-slot:top>
-        <v-toolbar flat>
-          <v-toolbar-title>{{ $t("servers") }}</v-toolbar-title>
-          <v-divider class="mx-4" inset vertical></v-divider>
-          <v-spacer></v-spacer>
-          <v-text-field
-            v-model="search"
-            append-icon="mdi-magnify"
-            :label="$t('search')"
-            single-line
-            hide-details
-          ></v-text-field>
-          <v-spacer></v-spacer>
-          <v-btn color="primary" @click="openDialog('add')">{{
-            $t("addServer")
-          }}</v-btn>
-          <form-dialog :dialog.sync="dialog" :mode="mode" :itemType="'server'">
-            <server-form
-              :initialData="editedItem"
-              @close="close"
-              @submit="submit"
-            />
-          </form-dialog>
-          <delete-dialog
-            :dialog.sync="dialogDelete"
-            :itemName="editedItemName"
-            :itemType="'server'"
-            @confirm-delete="deleteItemConfirm"
-            @cancel-delete="closeDelete"
+        <table-toolbar
+          :title="$t('servers')"
+          :search.sync="search"
+          :buttonText="$t('addServer')"
+          :openDialog="openDialog"
+        />
+        <form-dialog :dialog.sync="dialog" :mode="mode" :itemType="'server'">
+          <server-form
+            :initialData="editedItem"
+            @close="close"
+            @submit="submit"
           />
-        </v-toolbar>
+        </form-dialog>
+        <delete-dialog
+          :dialog.sync="dialogDelete"
+          :itemName="editedItemName"
+          :itemType="'server'"
+          @confirm-delete="deleteItemConfirm"
+          @cancel-delete="closeDelete"
+        />
       </template>
       <template v-slot:[`item.actions`]="{ item }">
         <v-icon small class="pa-2 mr-2" @click.stop="editItem(item)">
@@ -57,130 +47,39 @@
 import DeleteDialog from "~/components/dialogs/DeleteDialog.vue";
 import FormDialog from "~/components/dialogs/FormDialog.vue";
 import ServerForm from "~/components/forms/ServerForm.vue";
-import { headers } from "~/constants/headers";
-import { pagination } from "~/constants/pagination";
+import TableToolbar from "~/components/ui/DataTable/TableToolbar.vue";
+
+import { CrudMixin } from "~/mixins/CrudMixin";
+import { LocaleMixin } from "~/mixins/LocaleMixin";
 export default {
   components: {
     DeleteDialog,
     FormDialog,
     ServerForm,
+    TableToolbar,
   },
+  mixins: [CrudMixin, LocaleMixin],
   data() {
     return {
-      pagination: pagination(this.$i18n),
-      headers: headers(this.$i18n),
-      search: "",
-      dialog: false,
-      mode: "add",
-      dialogDelete: false,
-      editedIndex: -1,
-      editedItem: {
-        name: "",
-        created: null,
-        edited: null,
-        tasksIds: [],
-        appsIds: [],
-      },
-      defaultItem: {
-        name: "",
-        created: null,
-        edited: null,
-        tasksIds: [],
-        appsIds: [],
-      },
+      module: "servers",
+      itemType: "Server",
     };
   },
   methods: {
-    handleClick(item) {
-      this.$router.push(this.$route.path + "/" + item.id);
-    },
-    editItem(item) {
-      this.mode = "edit";
-      this.editedIndex = this.servers.indexOf(item);
-      this.editedItem = Object.assign({}, item);
-      this.dialog = true;
-    },
-    deleteItem(item) {
-      this.editedIndex = item.id;
-      this.editedItem = Object.assign({}, item);
-      this.dialogDelete = true;
-    },
-    deleteItemConfirm() {
-      this.$store.dispatch("modules/servers/removeServer", this.editedIndex);
-      this.closeDelete();
-    },
-    closeDelete() {
-      this.dialogDelete = false;
-      this.$nextTick(() => {
-        this.editedItem = Object.assign({}, this.defaultItem);
-        this.editedIndex = -1;
-      });
-    },
-    submit(formData) {
-      const data = {
-        ...formData,
-        edited: new Date().toLocaleString(),
-      };
-      if (!formData.created) {
-        data.created = new Date().toLocaleString();
-      }
-      if (this.editedIndex > -1) {
-        this.$store.dispatch("modules/servers/updateServer", {
-          index: this.editedIndex,
-          item: data,
-        });
-      } else {
-        this.$store.dispatch("modules/servers/addServer", data);
-      }
-      this.dialog = false;
-    },
-    close() {
-      this.dialog = false;
-      this.$nextTick(() => {
-        this.editedItem = Object.assign({}, this.defaultItem);
-        this.editedIndex = -1;
-      });
-    },
-    openDialog(mode) {
-      this.mode = mode;
-      this.dialog = true;
-    },
-    localeChanged() {
-      this.headers = headers(this.$i18n);
-      this.pagination = pagination(this.$i18n);
-    },
-    setTVar() {
-      this.$i18n.locale = this.$store.getters.getLang;
-    },
     loadServers() {
       this.$store.dispatch("modules/servers/loadServers");
     },
   },
   computed: {
-    servers() {
-      return this.$store.getters["modules/servers/servers"];
-    },
     hasServers() {
       return this.$store.getters["modules/servers/hasServers"];
     },
     filteredServers() {
       const searchLower = this.search.toLowerCase();
-      return this.servers.filter((server) =>
+      return this.items.filter((server) =>
         server.name.toLowerCase().includes(searchLower)
       );
     },
-    editedItemName() {
-      return this.editedItem.name;
-    },
-  },
-  watch: {
-    "$i18n.locale": "localeChanged",
-    "$store.getters.getLang": "setTVar",
-  },
-  beforeRouteEnter(_, from, next) {
-    next((vm) => {
-      vm.setTVar();
-    });
   },
   created() {
     this.loadServers();

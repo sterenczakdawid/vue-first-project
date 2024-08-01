@@ -1,4 +1,4 @@
-export const pagination = (i18n) => {
+export const footer = (i18n) => {
   return {
     "items-per-page-options": [5, 10, 15, -1],
     "items-per-page-text": i18n.t("itemsPerPage"),

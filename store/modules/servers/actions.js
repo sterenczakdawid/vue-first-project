@@ -1,18 +1,30 @@
 import axios from "axios";
 
 export default {
-  addServer(context, server) {
+  async addServer(context, server) {
     const serverData = {
-      id: context.getters.nextId,
+      // id: context.getters.nextId,
       name: server.name,
       created: server.created,
       edited: server.edited,
-      tasksIds: server.tasksIds,
-      appsIds: server.appsIds,
+      // tasksIds: server.tasksIds,
+      // appsIds: server.appsIds,
     };
-    context.commit("addServer", serverData);
+    const res = await axios.post(
+      "https://localhost:7233/api/Server",
+      serverData
+    );
+    console.log(res.data[res.data.length - 1]);
+    context.commit("addServer", {
+      ...serverData,
+      id: res.data[res.data.length - 1].id,
+    });
   },
-  removeServer(context, serverId) {
+  async removeServer(context, serverId) {
+    const res = await axios.delete("https://localhost:7233/api/Server", {
+      params: { id: parseInt(serverId) },
+    });
+    console.log(res);
     context.commit("modules/tasks/removeServerTasks", parseInt(serverId), {
       root: true,
     });
