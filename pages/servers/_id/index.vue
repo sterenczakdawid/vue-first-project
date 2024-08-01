@@ -28,7 +28,7 @@
           :items-per-page="5"
           :footer-props="footer"
           class="row-pointer"
-          @click:row="handleClick"
+          @click:row="handleClickTask"
         ></v-data-table
       ></v-tab-item>
     </v-tabs-items>
@@ -59,8 +59,8 @@ import DeleteDialog from "~/components/dialogs/DeleteDialog.vue";
 import ServerFormDialog from "~/components/dialogs/FormDialog.vue";
 import ServerForm from "~/components/forms/ServerForm.vue";
 import ItemDetails from "~/components/ui/ItemDetails.vue";
-import { detailsHeaders } from "~/constants/headers";
-import { footer } from "~/constants/footer";
+
+import { LocaleMixin } from "~/mixins/LocaleMixin";
 export default {
   components: {
     BackButton,
@@ -69,10 +69,9 @@ export default {
     ServerForm,
     ItemDetails,
   },
+  mixins: [LocaleMixin],
   data() {
     return {
-      footer: footer(this.$i18n),
-      headers: detailsHeaders(this.$i18n),
       dialogDelete: false,
       dialogEdit: false,
       editedItem: {},
@@ -112,7 +111,7 @@ export default {
     },
   },
   methods: {
-    handleClick(item) {
+    handleClickTask(item) {
       this.$router.push("/tasks/" + item.id);
     },
     handleClickApp(item) {
@@ -129,17 +128,6 @@ export default {
     editItem() {
       this.editedItem = Object.assign({}, this.selectedServer);
       this.dialogEdit = true;
-    },
-    editItemSubmit(data) {
-      this.$store
-        .dispatch("modules/servers/updateServer", {
-          index: this.servers.indexOf(this.selectedServer),
-          item: data,
-        })
-        .then(() => {
-          this.selectedServer = { ...data };
-        });
-      this.dialogEdit = false;
     },
     submit(formData) {
       const data = {
@@ -167,13 +155,6 @@ export default {
         this.dialogDelete = false;
       }
     },
-    localeChanged() {
-      this.headers = detailsHeaders(this.$i18n);
-      this.footer = footer(this.$i18n);
-    },
-    setTVar() {
-      this.$i18n.locale = this.$store.getters.getLang;
-    },
     loadTasks() {
       this.$store.dispatch("modules/servers/loadServers");
       this.$store.dispatch("modules/tasks/loadTasks");
@@ -185,15 +166,6 @@ export default {
     this.selectedServer = this.$store.getters["modules/servers/servers"].find(
       (server) => server.id == this.id
     );
-  },
-  watch: {
-    "$i18n.locale": "localeChanged",
-    "$store.getters.getLang": "setTVar",
-  },
-  beforeRouteEnter(_, from, next) {
-    next((vm) => {
-      vm.setTVar();
-    });
   },
 };
 </script>

@@ -38,6 +38,7 @@
               class="lol"
               clearable
             ></v-select>
+            <v-spacer></v-spacer>
           </template>
         </table-toolbar>
         <form-dialog :dialog.sync="dialog" :mode="mode" :itemType="'task'">
@@ -71,7 +72,7 @@
 import DeleteDialog from "~/components/dialogs/DeleteDialog.vue";
 import FormDialog from "~/components/dialogs/FormDialog.vue";
 import TaskForm from "~/components/forms/TaskForm.vue";
-import TableToolbar from "~/components/ui/DataTable/TableToolbar.vue";
+import TableToolbar from "~/components/ui/TableToolbar.vue";
 import { LocaleMixin } from "~/mixins/LocaleMixin";
 import { CrudMixin } from "~/mixins/CrudMixin";
 export default {
@@ -89,12 +90,6 @@ export default {
       selectedServer: null,
       selectedApp: null,
     };
-  },
-  methods: {
-    loadTasks() {
-      this.$store.dispatch("modules/servers/loadServers");
-      this.$store.dispatch("modules/tasks/loadTasks");
-    },
   },
   computed: {
     servers() {
@@ -125,9 +120,6 @@ export default {
         ? this.apps.filter((app) => app.serverId === this.selectedServer)
         : this.apps;
     },
-  },
-  created() {
-    this.loadTasks();
   },
 };
 </script>

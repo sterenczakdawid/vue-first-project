@@ -13,7 +13,7 @@
       }}</NuxtLink>
     </p>
     <v-data-table
-      :headers="headers"
+      :headers="detailsHeaders"
       :items="filteredTasks"
       :items-per-page="5"
       :footer-props="footer"
@@ -44,8 +44,8 @@ import ItemDetails from "~/components/ui/ItemDetails.vue";
 import AppForm from "~/components/forms/AppForm.vue";
 import FormDialog from "~/components/dialogs/FormDialog.vue";
 import DeleteDialog from "~/components/dialogs/DeleteDialog.vue";
-import { detailsHeaders } from "~/constants/headers";
-import { footer } from "~/constants/footer";
+
+import { LocaleMixin } from "~/mixins/LocaleMixin";
 export default {
   components: {
     BackButton,
@@ -54,10 +54,9 @@ export default {
     FormDialog,
     DeleteDialog,
   },
+  mixins: [LocaleMixin],
   data() {
     return {
-      footer: footer(this.$i18n),
-      headers: detailsHeaders(this.$i18n),
       selectedApp: null,
       id: this.$route.params.id,
       editedItem: {},
@@ -131,27 +130,11 @@ export default {
       this.selectedApp = { ...data };
       this.dialogEdit = false;
     },
-    localeChanged() {
-      this.headers = detailsHeaders(this.$i18n);
-      this.footer = footer(this.$i18n);
-    },
-    setTVar() {
-      this.$i18n.locale = this.$store.getters.getLang;
-    },
   },
   created() {
     this.selectedApp = this.$store.getters["modules/apps/apps"].find(
       (app) => app.id == this.id
     );
-  },
-  watch: {
-    "$i18n.locale": "localeChanged",
-    "$store.getters.getLang": "setTVar",
-  },
-  beforeRouteEnter(_, from, next) {
-    next((vm) => {
-      vm.setTVar();
-    });
   },
 };
 </script>

@@ -6,7 +6,6 @@
       :items-per-page="5"
       :search="search"
       :footer-props="footer"
-      v-if="hasServers"
       @click:row="handleClick"
     >
       <template v-slot:top>
@@ -47,7 +46,7 @@
 import DeleteDialog from "~/components/dialogs/DeleteDialog.vue";
 import FormDialog from "~/components/dialogs/FormDialog.vue";
 import ServerForm from "~/components/forms/ServerForm.vue";
-import TableToolbar from "~/components/ui/DataTable/TableToolbar.vue";
+import TableToolbar from "~/components/ui/TableToolbar.vue";
 
 import { CrudMixin } from "~/mixins/CrudMixin";
 import { LocaleMixin } from "~/mixins/LocaleMixin";
@@ -65,24 +64,13 @@ export default {
       itemType: "Server",
     };
   },
-  methods: {
-    loadServers() {
-      this.$store.dispatch("modules/servers/loadServers");
-    },
-  },
   computed: {
-    hasServers() {
-      return this.$store.getters["modules/servers/hasServers"];
-    },
     filteredServers() {
       const searchLower = this.search.toLowerCase();
       return this.items.filter((server) =>
         server.name.toLowerCase().includes(searchLower)
       );
     },
-  },
-  created() {
-    this.loadServers();
   },
 };
 </script>

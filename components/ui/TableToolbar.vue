@@ -12,7 +12,6 @@
     ></v-text-field>
     <v-spacer></v-spacer>
     <slot name="filters"></slot>
-    <v-spacer></v-spacer>
     <v-btn color="primary" @click="openDialog('add')">{{ buttonText }}</v-btn>
   </v-toolbar>
 </template>

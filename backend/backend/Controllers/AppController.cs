@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 
 namespace backend.Controllers
 {
@@ -41,17 +42,35 @@ namespace backend.Controllers
 
     [EnableCors("AllowAllOrigins")]
     [HttpPost]
-    public async Task<ActionResult<List<App>>> AddApp(App app)
+    public async Task<ActionResult<List<App>>> AddApp(AppDTO app)
     {
-      _context.Apps.Add(app);
+      var newApp = new App
+      {
+        Name = app.Name,
+        Created = app.Created,
+        Edited = app.Edited,
+        ServerId = app.ServerId
+      };
+
+      _context.Apps.Add(newApp);
       await _context.SaveChangesAsync();
+
+      if (app.tasksIds != null && app.tasksIds.Any())
+      {
+        var tasksToUpdate = await _context.Tasks.Where(t => app.tasksIds.Contains(t.Id)).ToListAsync();
+        foreach (var task in tasksToUpdate)
+        {
+          task.AppId = newApp.Id;
+        }
+        await _context.SaveChangesAsync();
+      }
 
       return Ok(await _context.Apps.ToListAsync());
     }
 
     [EnableCors("AllowAllOrigins")]
     [HttpPut]
-    public async Task<ActionResult<List<App>>> UpdateApp(App updatedApp)
+    public async Task<ActionResult<List<App>>> UpdateApp(AppDTO updatedApp)
     {
       var dbApp = await _context.Apps.FindAsync(updatedApp.Id);
       if (dbApp is null)
@@ -60,6 +79,23 @@ namespace backend.Controllers
       }
 
       dbApp.Name = updatedApp.Name;
+      dbApp.Edited = updatedApp.Edited;
+      dbApp.ServerId = updatedApp.ServerId;
+      Console.WriteLine(updatedApp.tasksIds[0]);
+
+      // Clear existing task associations
+      var existingTasks = await _context.Tasks.Where(t => t.AppId == dbApp.Id).ToListAsync();
+      foreach (var task in existingTasks)
+      {
+        task.AppId = 0;
+      }
+
+      // Associate tasks based on tasksIds
+      var tasksToUpdate = await _context.Tasks.Where(t => updatedApp.tasksIds.Contains(t.Id)).ToListAsync();
+      foreach (var task in tasksToUpdate)
+      {
+        task.AppId = dbApp.Id;
+      }
 
       await _context.SaveChangesAsync();
 
@@ -77,6 +113,22 @@ namespace backend.Controllers
       }
 
       _context.Apps.Remove(dbApp);
+      await _context.SaveChangesAsync();
+
+      return Ok(await _context.Apps.ToListAsync());
+    }
+
+    [EnableCors("AllowAllOrigins")]
+    [HttpDelete("server/{serverId}")]
+    public async Task<ActionResult<List<App>>> RemoveServerApps(int serverId)
+    {
+      var apps = await _context.Apps.Where(a => a.ServerId == serverId).ToListAsync();
+      if (apps.Count == 0)
+      {
+        return BadRequest("No tasks found for the given server.");
+      }
+
+      _context.Apps.RemoveRange(apps);
       await _context.SaveChangesAsync();
 
       return Ok(await _context.Apps.ToListAsync());

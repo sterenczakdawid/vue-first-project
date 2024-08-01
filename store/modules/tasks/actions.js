@@ -1,24 +1,31 @@
 import axios from "axios";
 
 export default {
-  addTask(context, task) {
+  async addTask(context, task) {
     const taskData = {
-      id: context.getters.nextId,
       name: task.name,
       created: task.created,
       edited: task.edited,
       serverId: task.serverId,
       appId: task.appId,
     };
-    context.commit("addTask", taskData);
+    const res = await axios.post("https://localhost:7233/api/Task", taskData);
+    const newTaskId = res.data[res.data.length - 1].id;
+    context.commit("addTask", { ...taskData, id: newTaskId });
   },
-  updateTask(context, taskData) {
+  async updateTask(context, taskData) {
     const { index, item } = taskData;
+    console.log(item);
+    const res = await axios.put("https://localhost:7233/api/Task", item);
     context.commit("updateTask", { index, item });
   },
   async removeTask(context, taskId) {
+    const res = await axios.delete("https://localhost:7233/api/Task", {
+      params: { id: parseInt(taskId) },
+    });
     context.commit("removeTask", parseInt(taskId));
   },
+
   removeServerTasks(context, serverId) {
     context.commit("removeServerTasks", parseInt(serverId));
   },
@@ -30,7 +37,6 @@ export default {
   },
   async loadTasks(context) {
     const response = await axios.get("https://localhost:7233/api/Task");
-    // console.log(response.data);
     context.commit("setTasks", response.data);
   },
 };

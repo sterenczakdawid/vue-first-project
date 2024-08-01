@@ -60,6 +60,7 @@ namespace backend.Controllers
       }
 
       dbServer.Name = updatedServer.Name;
+      dbServer.Edited = updatedServer.Edited;
 
       await _context.SaveChangesAsync();
 

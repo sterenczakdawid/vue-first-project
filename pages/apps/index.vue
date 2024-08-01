@@ -26,6 +26,7 @@
               clearable
               class="maxw"
             ></v-select>
+            <v-spacer></v-spacer>
           </template>
         </table-toolbar>
         <form-dialog :dialog.sync="dialog" :mode="mode" :itemType="'app'">
@@ -60,7 +61,7 @@ import DeleteDialog from "~/components/dialogs/DeleteDialog.vue";
 import FormDialog from "~/components/dialogs/FormDialog.vue";
 import TaskForm from "~/components/forms/TaskForm.vue";
 import AppForm from "~/components/forms/AppForm.vue";
-import TableToolbar from "~/components/ui/DataTable/TableToolbar.vue";
+import TableToolbar from "~/components/ui/TableToolbar.vue";
 import { CrudMixin } from "~/mixins/CrudMixin";
 import { LocaleMixin } from "~/mixins/LocaleMixin";
 export default {
@@ -78,13 +79,6 @@ export default {
       itemType: "App",
       selectedServer: null,
     };
-  },
-  methods: {
-    loadApps() {
-      this.$store.dispatch("modules/apps/loadApps");
-      this.$store.dispatch("modules/tasks/loadTasks");
-      this.$store.dispatch("modules/servers/loadServers");
-    },
   },
   computed: {
     servers() {
@@ -104,9 +98,6 @@ export default {
         return serverMatch && nameMatch;
       });
     },
-  },
-  created() {
-    this.loadApps();
   },
 };
 </script>

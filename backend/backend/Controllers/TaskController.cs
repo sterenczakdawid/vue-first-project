@@ -61,6 +61,9 @@ namespace backend.Controllers
       }
 
       dbTask.Name = updatedTask.Name;
+      dbTask.Edited = updatedTask.Edited;
+      dbTask.AppId = updatedTask.AppId;
+      dbTask.ServerId = updatedTask.ServerId;
 
       await _context.SaveChangesAsync();
 
@@ -78,6 +81,21 @@ namespace backend.Controllers
       }
 
       _context.Tasks.Remove(dbTask);
+      await _context.SaveChangesAsync();
+
+      return Ok(await _context.Tasks.ToListAsync());
+    }
+
+    [EnableCors("AllowAllOrigins")]
+    [HttpDelete("server/{serverId}")]
+    public async Task<ActionResult<List<MyTask>>> RemoveServerTasks(int serverId) {
+      var tasks = await _context.Tasks.Where(t => t.ServerId == serverId).ToListAsync();
+      if (tasks.Count == 0)
+      {
+        return BadRequest("No tasks found for the given server.");
+      }
+
+      _context.Tasks.RemoveRange(tasks);
       await _context.SaveChangesAsync();
 
       return Ok(await _context.Tasks.ToListAsync());

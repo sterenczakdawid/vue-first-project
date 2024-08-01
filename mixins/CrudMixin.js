@@ -102,9 +102,13 @@ export const CrudMixin = {
       }
       this.dialog = false;
     },
+    loadItems() {
+      this.$store.dispatch("modules/apps/loadApps");
+      this.$store.dispatch("modules/tasks/loadTasks");
+      this.$store.dispatch("modules/servers/loadServers");
+    },
   },
-  //   // loadItems() {
-  //   //   this.$store.dispatch(`modules/${this.module}/loadItems`);
-  //   // },
-  // },
+  created() {
+    this.loadItems();
+  },
 };

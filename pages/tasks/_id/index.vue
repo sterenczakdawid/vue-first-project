@@ -43,6 +43,8 @@ import TaskForm from "~/components/forms/TaskForm.vue";
 import FormDialog from "~/components/dialogs/FormDialog.vue";
 import DeleteDialog from "~/components/dialogs/DeleteDialog.vue";
 import ItemDetails from "~/components/ui/ItemDetails.vue";
+import { LocaleMixin } from "~/mixins/LocaleMixin";
+import { ItemDetailsMixin } from "~/mixins/ItemDetailsMixin";
 export default {
   components: {
     BackButton,
@@ -51,13 +53,10 @@ export default {
     DeleteDialog,
     ItemDetails,
   },
+  mixins: [LocaleMixin, ItemDetailsMixin],
   data() {
     return {
       selectedTask: null,
-      id: this.$route.params.id,
-      editedItem: {},
-      dialogEdit: false,
-      dialogDelete: false,
     };
   },
   computed: {
@@ -141,21 +140,10 @@ export default {
       this.selectedTask = { ...data };
       this.dialogEdit = false;
     },
-    setTVar() {
-      this.$i18n.locale = this.$store.getters.getLang;
-    },
     loadTasks() {
       this.$store.dispatch("modules/servers/loadServers");
       this.$store.dispatch("modules/tasks/loadTasks");
     },
-  },
-  watch: {
-    "$store.getters.getLang": "setTVar",
-  },
-  beforeRouteEnter(_, from, next) {
-    next((vm) => {
-      vm.setTVar();
-    });
   },
 };
 </script>
