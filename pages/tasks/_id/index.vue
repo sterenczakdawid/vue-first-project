@@ -1,5 +1,8 @@
 <template>
-  <div>
+  <div v-if="isLoading">
+    <v-progress-circular indeterminate></v-progress-circular>
+  </div>
+  <div v-else>
     <item-details
       :itemType="'Task'"
       :item="this.selectedTask"
@@ -43,8 +46,8 @@ import TaskForm from "~/components/forms/TaskForm.vue";
 import FormDialog from "~/components/dialogs/FormDialog.vue";
 import DeleteDialog from "~/components/dialogs/DeleteDialog.vue";
 import ItemDetails from "~/components/ui/ItemDetails.vue";
+
 import { LocaleMixin } from "~/mixins/LocaleMixin";
-import { ItemDetailsMixin } from "~/mixins/ItemDetailsMixin";
 export default {
   components: {
     BackButton,
@@ -53,10 +56,15 @@ export default {
     DeleteDialog,
     ItemDetails,
   },
-  mixins: [LocaleMixin, ItemDetailsMixin],
+  mixins: [LocaleMixin],
   data() {
     return {
       selectedTask: null,
+      id: this.$route.params.id,
+      editedItem: {},
+      dialogEdit: false,
+      dialogDelete: false,
+      isLoading: true,
     };
   },
   computed: {
@@ -70,34 +78,39 @@ export default {
       return this.$store.getters["modules/apps/apps"];
     },
     name() {
-      return this.selectedTask.name;
+      return this.selectedTask ? this.selectedTask.name : "";
     },
     serverId() {
-      return this.selectedTask.serverId;
+      return this.selectedTask ? this.selectedTask.serverId : null;
     },
     serverName() {
-      return this.servers.find((server) => server.id == this.serverId).name;
+      const server = this.servers.find((server) => server.id == this.serverId);
+      return server ? server.name : "";
     },
     appId() {
-      return this.selectedTask.appId;
+      return this.selectedTask ? this.selectedTask.appId : null;
     },
     appName() {
       if (this.appId != 0 && this.appId !== null) {
-        return this.apps.find((app) => app.id == this.appId).name;
+        const app = this.apps.find((app) => app.id == this.appId);
+        return app ? app.name : "";
       }
-    },
-    created() {
-      return this.selectedTask.created;
-    },
-    edited() {
-      return this.selectedTask.edited;
+      return "";
     },
   },
   created() {
     this.loadTasks();
-    this.selectedTask = this.$store.getters["modules/tasks/tasks"].find(
-      (task) => task.id == this.id
-    );
+    // console.log(this.$route.params);
+    // this.$store.dispatch("modules/tasks/loadTasks");
+    // console.log(this.$store.getters["modules/tasks/tasks"]);
+    // // const tasks = this.loadTasks();
+    // // this.selectedTask = this.$store.getters["modules/tasks/tasks"].find(
+    // //   (task) => task.id == this.id
+    // // );
+    // this.selectedTask = this.$store.getters["modules/tasks/tasks"].find(
+    //   (task) => task.id == this.$route.params.id
+    // );
+    console.log("created", this.selectedTask);
   },
   methods: {
     editItem() {
@@ -140,9 +153,31 @@ export default {
       this.selectedTask = { ...data };
       this.dialogEdit = false;
     },
-    loadTasks() {
-      this.$store.dispatch("modules/servers/loadServers");
-      this.$store.dispatch("modules/tasks/loadTasks");
+    // loadTasks() {
+    //   this.$store.dispatch("modules/servers/loadServers");
+    //   this.$store.dispatch("modules/tasks/loadTasks");
+    // },
+    async loadTasks() {
+      this.isLoading = true;
+      await this.$store.dispatch("modules/servers/loadServers");
+      await this.$store.dispatch("modules/tasks/loadTasks");
+      this.selectedTask = this.tasks.find((task) => task.id == this.id);
+      this.isLoading = false;
+    },
+  },
+  watch: {
+    "$route.params.id": {
+      immediate: true,
+      handler(newId) {
+        this.id = newId;
+        this.loadTasks();
+      },
+    },
+    tasks: {
+      immediate: true,
+      handler() {
+        this.selectedTask = this.tasks.find((task) => task.id == this.id);
+      },
     },
   },
 };

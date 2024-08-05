@@ -33,6 +33,7 @@ export const CrudMixin = {
   methods: {
     handleClick(item) {
       this.$router.push(this.$route.path + "/" + item.id);
+      console.log(item);
     },
     editItem(item) {
       this.mode = "edit";
@@ -84,10 +85,10 @@ export const CrudMixin = {
     submit(formData) {
       const data = {
         ...formData,
-        edited: new Date().toLocaleString(),
+        edited: new Date().toLocaleString().slice(0, -3),
       };
       if (!formData.created) {
-        data.created = new Date().toLocaleString();
+        data.created = new Date().toLocaleString().slice(0, -3);
       }
       if (this.editedIndex > -1) {
         this.$store.dispatch(`modules/${this.module}/update${this.itemType}`, {
@@ -103,8 +104,13 @@ export const CrudMixin = {
       this.dialog = false;
     },
     loadItems() {
+      // console.log("loadItems w crud mixin wywolane");
       this.$store.dispatch("modules/apps/loadApps");
-      this.$store.dispatch("modules/tasks/loadTasks");
+      // this.$store.dispatch("modules/tasks/loadTasks", {
+      //   page: this.page,
+      //   pageSize: this.pageSize,
+      // });
+      // this.$store.dispatch("modules/tasks/loadTasks");
       this.$store.dispatch("modules/servers/loadServers");
     },
   },

@@ -3,11 +3,21 @@
     <v-data-table
       :headers="headers"
       :items="filteredTasks"
+      :server-items-length="totalTasks"
+      :items-per-page="pageSize"
+      :search="search"
+      :footer-props="footer"
+      @click:row="handleClick"
+      @update:options="handlePageChange"
+    >
+      <!-- <v-data-table
+      :headers="headers"
+      :items="filteredTasks"
       :items-per-page="5"
       :search="search"
       :footer-props="footer"
       @click:row="handleClick"
-    >
+    > -->
       <template v-slot:top>
         <table-toolbar
           :title="$t('tasks')"
@@ -75,6 +85,7 @@ import TaskForm from "~/components/forms/TaskForm.vue";
 import TableToolbar from "~/components/ui/TableToolbar.vue";
 import { LocaleMixin } from "~/mixins/LocaleMixin";
 import { CrudMixin } from "~/mixins/CrudMixin";
+import { debounce } from "~/constants/debounce";
 export default {
   components: {
     DeleteDialog,
@@ -89,6 +100,9 @@ export default {
       itemType: "Task",
       selectedServer: null,
       selectedApp: null,
+      currentPage: null,
+      pageSize: null,
+      debouncedLoadTasks: null,
     };
   },
   computed: {
@@ -100,6 +114,9 @@ export default {
     },
     tasks() {
       return this.$store.getters["modules/tasks/tasks"];
+    },
+    totalTasks() {
+      return this.$store.getters["modules/tasks/totalTasks"];
     },
     filteredTasks() {
       return this.tasks.filter((task) => {
@@ -120,6 +137,49 @@ export default {
         ? this.apps.filter((app) => app.serverId === this.selectedServer)
         : this.apps;
     },
+  },
+  methods: {
+    handlePageChange(options) {
+      console.log("page change detected");
+      this.currentPage = options.page;
+      this.pageSize = options.itemsPerPage;
+      this.loadTasks();
+    },
+    async loadTasks() {
+      // console.log(
+      //   `wysylam loadTasks page: ${this.currentPage}, pageSize: ${this.pageSize}, serverId: ${this.selectedServer}, appId: ${this.selectedApp}, search: ${this.search}`
+      // );
+      // console.log("loadTasks w taskach vue wywolane");
+      const res = await this.$store.dispatch("modules/tasks/loadTasks", {
+        page: this.currentPage,
+        pageSize: this.pageSize,
+        ...(this.selectedServer ? { serverId: this.selectedServer } : {}),
+        ...(this.selectedApp ? { appId: this.selectedApp } : {}),
+        ...(this.search ? { search: this.search } : {}),
+      });
+      // console.log("loadTasks res:", res);
+    },
+  },
+  watch: {
+    selectedServer() {
+      console.log("selected server changed");
+      this.currentPage = 1;
+      this.loadTasks();
+    },
+    selectedApp() {
+      console.log("selected app changed");
+      this.currentPage = 1;
+      this.loadTasks();
+    },
+    search() {
+      console.log("search changed");
+      this.currentPage = 1;
+      this.debouncedLoadTasks();
+    },
+  },
+  created() {
+    // console.log("created");
+    this.debouncedLoadTasks = debounce(this.loadTasks, 500);
   },
 };
 </script>

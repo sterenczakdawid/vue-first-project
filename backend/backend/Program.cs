@@ -8,9 +8,9 @@ builder.Services.AddCors(options =>
   options.AddPolicy("AllowAllOrigins",
         builder => builder
             .AllowAnyOrigin()
-            //.WithOrigins("http://localhost:3000")
             .AllowAnyHeader()
-            .AllowAnyMethod());
+            .AllowAnyMethod()
+            .WithExposedHeaders("X-Total-Count"));
 });
 // Add services to the container.
 

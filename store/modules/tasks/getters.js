@@ -2,6 +2,12 @@ export default {
   tasks(state) {
     return state.tasks;
   },
+  totalTasks(state) {
+    return state.totalTasks;
+  },
+  totalPages() {
+    return Math.ceil(this.totalTasks / this.pageSize);
+  },
   hasTasks(state) {
     return state.tasks && state.tasks.length > 0;
   },

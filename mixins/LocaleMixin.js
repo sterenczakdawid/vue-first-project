@@ -14,7 +14,7 @@ export const LocaleMixin = {
     localeChanged() {
       this.detailsHeaders = detailsHeaders(this.$i18n);
       this.headers = headers(this.$i18n);
-      this.footer = footer(this.$i18n);
+      this.footer = footer(this.$i18n, this.pageSize);
     },
     setTVar() {
       this.$i18n.locale = this.$store.getters.getLang;

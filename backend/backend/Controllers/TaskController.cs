@@ -18,11 +18,44 @@ namespace backend.Controllers
       _context = context;
     }
 
+    //[EnableCors("AllowAllOrigins")]
+    //[HttpGet]
+    //public async Task<ActionResult<List<MyTask>>> GetAllTasks(int page = 1, int pageSize = 10)
+    //{
+    //  //var tasks = await _context.Tasks.ToListAsync();
+    //  var tasks = await _context.Tasks.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
+    //  var totalTasks = await _context.Tasks.CountAsync();
+
+    //  Response.Headers.Add("X-Total-Count", totalTasks.ToString());
+
+    //  return Ok(tasks);
+    //}
+
     [EnableCors("AllowAllOrigins")]
     [HttpGet]
-    public async Task<ActionResult<List<MyTask>>> GetAllTasks()
+    public async Task<ActionResult<List<MyTask>>> GetAllTasks(int page = 1, int pageSize = 5, int? serverId = null, int? appId = null, string search = "")
     {
-      var tasks = await _context.Tasks.ToListAsync();
+      var query = _context.Tasks.AsQueryable();
+
+      if (serverId.HasValue)
+      {
+        query = query.Where(t => t.ServerId == serverId);
+      }
+
+      if (appId.HasValue)
+      {
+        query = query.Where(t => t.AppId == appId);
+      }
+
+      if (!string.IsNullOrEmpty(search))
+      {
+        query = query.Where(t => t.Name.Contains(search));
+      }
+
+      var totalTasks = await query.CountAsync();
+      var tasks = await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
+
+      Response.Headers.Add("X-Total-Count", totalTasks.ToString());
 
       return Ok(tasks);
     }
@@ -62,7 +95,13 @@ namespace backend.Controllers
 
       dbTask.Name = updatedTask.Name;
       dbTask.Edited = updatedTask.Edited;
-      dbTask.AppId = updatedTask.AppId;
+      if(updatedTask.AppId is null)
+      {
+        dbTask.AppId = 0;
+      } else
+      {
+        dbTask.AppId = updatedTask.AppId;
+      }
       dbTask.ServerId = updatedTask.ServerId;
 
       await _context.SaveChangesAsync();

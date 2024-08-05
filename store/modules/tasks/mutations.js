@@ -31,4 +31,7 @@ export default {
   setTasks(state, payload) {
     state.tasks = payload;
   },
+  setTotalTasks(state, payload) {
+    state.totalTasks = payload;
+  },
 };

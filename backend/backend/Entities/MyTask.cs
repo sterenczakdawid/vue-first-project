@@ -7,6 +7,6 @@ namespace backend.Entities
     public string Created { get; set; }
     public string Edited { get; set; }
     public int ServerId { get; set; }
-    public int AppId { get; set; }
+    public int? AppId { get; set; }
   }
 }
