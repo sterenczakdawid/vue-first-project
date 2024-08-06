@@ -9,15 +9,8 @@
       :footer-props="footer"
       @click:row="handleClick"
       @update:options="handlePageChange"
+      :loading="isLoading"
     >
-      <!-- <v-data-table
-      :headers="headers"
-      :items="filteredTasks"
-      :items-per-page="5"
-      :search="search"
-      :footer-props="footer"
-      @click:row="handleClick"
-    > -->
       <template v-slot:top>
         <table-toolbar
           :title="$t('tasks')"
@@ -85,7 +78,7 @@ import TaskForm from "~/components/forms/TaskForm.vue";
 import TableToolbar from "~/components/ui/TableToolbar.vue";
 import { LocaleMixin } from "~/mixins/LocaleMixin";
 import { CrudMixin } from "~/mixins/CrudMixin";
-import { debounce } from "~/constants/debounce";
+import { debounce, capitalizeFirstLetter } from "~/constants/debounce";
 export default {
   components: {
     DeleteDialog,
@@ -102,7 +95,8 @@ export default {
       selectedApp: null,
       currentPage: null,
       pageSize: null,
-      debouncedLoadTasks: null,
+      sortBy: "",
+      sortDesc: false,
     };
   },
   computed: {
@@ -140,46 +134,47 @@ export default {
   },
   methods: {
     handlePageChange(options) {
-      console.log("page change detected");
       this.currentPage = options.page;
       this.pageSize = options.itemsPerPage;
+      this.sortBy = options.sortBy.length
+        ? capitalizeFirstLetter(options.sortBy[0])
+        : "";
+      this.sortDesc = options.sortDesc[0];
       this.loadTasks();
     },
     async loadTasks() {
-      // console.log(
-      //   `wysylam loadTasks page: ${this.currentPage}, pageSize: ${this.pageSize}, serverId: ${this.selectedServer}, appId: ${this.selectedApp}, search: ${this.search}`
-      // );
-      // console.log("loadTasks w taskach vue wywolane");
+      this.isLoading = true;
       const res = await this.$store.dispatch("modules/tasks/loadTasks", {
         page: this.currentPage,
         pageSize: this.pageSize,
+        sortBy: this.sortBy,
+        sortDesc: this.sortDesc,
         ...(this.selectedServer ? { serverId: this.selectedServer } : {}),
         ...(this.selectedApp ? { appId: this.selectedApp } : {}),
         ...(this.search ? { search: this.search } : {}),
       });
-      // console.log("loadTasks res:", res);
+      this.isLoading = false;
     },
   },
   watch: {
     selectedServer() {
-      console.log("selected server changed");
       this.currentPage = 1;
       this.loadTasks();
     },
     selectedApp() {
-      console.log("selected app changed");
       this.currentPage = 1;
       this.loadTasks();
     },
     search() {
-      console.log("search changed");
+      if (!this.search) this.search = "";
       this.currentPage = 1;
       this.debouncedLoadTasks();
     },
   },
-  created() {
-    // console.log("created");
+  async created() {
     this.debouncedLoadTasks = debounce(this.loadTasks, 500);
+    await this.loadAllServers();
+    await this.loadAllApps();
   },
 };
 </script>

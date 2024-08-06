@@ -19,9 +19,31 @@ namespace backend.Controllers
 
     [EnableCors("AllowAllOrigins")]
     [HttpGet]
-    public async Task<ActionResult<List<App>>> GetAllApps()
+    public async Task<ActionResult<List<App>>> GetAllApps(int page = 1, int pageSize = 5, int? serverId = null, string search = "")
     {
-      var apps = await _context.Apps.ToListAsync();
+      var query = _context.Apps.AsQueryable();
+
+      if (serverId.HasValue)
+      {
+        query = query.Where(t => t.ServerId == serverId);
+      }
+
+      if (!string.IsNullOrEmpty(search))
+      {
+        query = query.Where(t => t.Name.Contains(search));
+      }
+
+      var totalApps = await query.CountAsync();
+      List<App> apps;
+      if (pageSize <= 0)
+      {
+        apps = await query.ToListAsync();
+      }
+      else
+      {
+        apps = await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
+      }
+      Response.Headers.Add("X-Total-Count", totalApps.ToString());
 
       return Ok(apps);
     }
@@ -122,10 +144,6 @@ namespace backend.Controllers
     public async Task<ActionResult<List<App>>> RemoveServerApps(int serverId)
     {
       var apps = await _context.Apps.Where(a => a.ServerId == serverId).ToListAsync();
-      if (apps.Count == 0)
-      {
-        return BadRequest("No tasks found for the given server.");
-      }
 
       _context.Apps.RemoveRange(apps);
       await _context.SaveChangesAsync();

@@ -22,7 +22,6 @@ export default {
   },
   async updateApp(context, appData) {
     const { index, item } = appData;
-    console.log(item);
     const res = await axios.put("https://localhost:7233/api/App", item);
 
     context.commit("updateApp", { index, item });
@@ -38,8 +37,11 @@ export default {
   removeServerApps(context, serverId) {
     context.commit("removeServerApps", serverId);
   },
-  async loadApps(context) {
-    const response = await axios.get("https://localhost:7233/api/App");
+  async loadApps(context, params) {
+    const response = await axios.get("https://localhost:7233/api/App", {
+      params,
+    });
     context.commit("setApps", response.data);
+    context.commit("setTotalApps", parseInt(response.headers["x-total-count"]));
   },
 };

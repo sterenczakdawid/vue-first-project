@@ -1,5 +1,8 @@
 <template>
-  <div>
+  <div v-if="isLoading">
+    <v-progress-circular indeterminate></v-progress-circular>
+  </div>
+  <div v-else>
     <item-details
       :itemType="'Application'"
       :item="this.selectedApp"
@@ -62,6 +65,7 @@ export default {
       editedItem: {},
       dialogEdit: false,
       dialogDelete: false,
+      isLoading: true,
     };
   },
   computed: {
@@ -75,10 +79,11 @@ export default {
       return this.selectedApp.serverId;
     },
     serverName() {
-      return this.servers.find((server) => server.id == this.serverId).name;
+      const server = this.servers.find((server) => server.id == this.serverId);
+      return server ? server.name : "";
     },
     name() {
-      return this.selectedApp.name;
+      return this.selectedApp ? this.selectedApp.name : "";
     },
     tasks() {
       return this.$store.getters["modules/tasks/tasks"];
@@ -130,11 +135,38 @@ export default {
       this.selectedApp = { ...data };
       this.dialogEdit = false;
     },
+    async loadApps() {
+      this.isLoading = true;
+      await this.$store.dispatch("modules/apps/loadApps", {
+        pageSize: -1,
+      });
+      await this.$store.dispatch("modules/servers/loadServers", {
+        pageSize: -1,
+      });
+      await this.$store.dispatch("modules/tasks/loadTasks", {
+        pageSize: -1,
+      });
+      this.selectedApp = this.apps.find((app) => app.id == this.id);
+      this.isLoading = false;
+    },
   },
   created() {
-    this.selectedApp = this.$store.getters["modules/apps/apps"].find(
-      (app) => app.id == this.id
-    );
+    this.loadApps();
+  },
+  watch: {
+    "$route.params.id": {
+      immediate: true,
+      handler(newId) {
+        this.id = newId;
+        this.loadApps();
+      },
+    },
+    apps: {
+      immediate: true,
+      handler() {
+        this.selectedApp = this.apps.find((app) => app.id == this.id);
+      },
+    },
   },
 };
 </script>

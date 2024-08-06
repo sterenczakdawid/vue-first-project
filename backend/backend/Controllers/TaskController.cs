@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 using System.Threading.Tasks;
 
 namespace backend.Controllers
@@ -33,7 +34,7 @@ namespace backend.Controllers
 
     [EnableCors("AllowAllOrigins")]
     [HttpGet]
-    public async Task<ActionResult<List<MyTask>>> GetAllTasks(int page = 1, int pageSize = 5, int? serverId = null, int? appId = null, string search = "")
+    public async Task<ActionResult<List<MyTask>>> GetAllTasks(int page = 1, int pageSize = 5, int? serverId = null, int? appId = null, string search = "", string sortBy = "", bool? sortDesc = false)
     {
       var query = _context.Tasks.AsQueryable();
 
@@ -52,9 +53,31 @@ namespace backend.Controllers
         query = query.Where(t => t.Name.Contains(search));
       }
 
-      var totalTasks = await query.CountAsync();
-      var tasks = await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
+      // Sortowanie
+      if (!string.IsNullOrEmpty(sortBy))
+      {
+        if (sortDesc.GetValueOrDefault())
+        {
+          query = query.OrderByDescending(e => EF.Property<object>(e, sortBy));
+        }
+        else
+        {
+          query = query.OrderBy(e => EF.Property<object>(e, sortBy));
+        }
+      }
 
+      var totalTasks = await query.CountAsync();
+      List<MyTask> tasks;
+      if (pageSize <= 0)
+      {
+        tasks = await query.ToListAsync();
+      }
+      else
+      {
+        tasks = await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
+      }
+
+      // Dodawanie nagłówka z całkowitą liczbą zadań
       Response.Headers.Add("X-Total-Count", totalTasks.ToString());
 
       return Ok(tasks);
@@ -77,6 +100,14 @@ namespace backend.Controllers
     [HttpPost]
     public async Task<ActionResult<List<MyTask>>> AddTask(MyTask task)
     {
+      Console.WriteLine(task.Id);
+      Console.WriteLine(task.Name);
+      Console.WriteLine(task.AppId);
+      if (task.AppId is null)
+      {
+        task.AppId = 0;
+      }
+
       _context.Tasks.Add(task);
       await _context.SaveChangesAsync();
 
@@ -129,10 +160,6 @@ namespace backend.Controllers
     [HttpDelete("server/{serverId}")]
     public async Task<ActionResult<List<MyTask>>> RemoveServerTasks(int serverId) {
       var tasks = await _context.Tasks.Where(t => t.ServerId == serverId).ToListAsync();
-      if (tasks.Count == 0)
-      {
-        return BadRequest("No tasks found for the given server.");
-      }
 
       _context.Tasks.RemoveRange(tasks);
       await _context.SaveChangesAsync();

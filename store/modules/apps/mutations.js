@@ -15,4 +15,7 @@ export default {
   setApps(state, payload) {
     state.apps = payload;
   },
+  setTotalApps(state, payload) {
+    state.totalApps = payload;
+  },
 };

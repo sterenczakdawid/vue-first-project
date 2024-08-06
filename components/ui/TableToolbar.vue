@@ -9,6 +9,7 @@
       :label="$t('search')"
       single-line
       hide-details
+      clearable
     ></v-text-field>
     <v-spacer></v-spacer>
     <slot name="filters"></slot>

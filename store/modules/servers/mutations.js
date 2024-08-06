@@ -14,4 +14,7 @@ export default {
   setServers(state, payload) {
     state.servers = payload;
   },
+  setTotalServers(state, payload) {
+    state.totalServers = payload;
+  },
 };

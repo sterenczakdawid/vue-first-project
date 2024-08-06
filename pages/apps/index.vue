@@ -3,10 +3,13 @@
     <v-data-table
       :headers="headers"
       :items="filteredApps"
-      :items-per-page="5"
+      :server-items-length="totalApps"
+      :items-per-page="pageSize"
       :search="search"
       :footer-props="footer"
       @click:row="handleClick"
+      @update:options="handlePageChange"
+      :loading="isLoading"
     >
       <template v-slot:top>
         <table-toolbar
@@ -64,6 +67,7 @@ import AppForm from "~/components/forms/AppForm.vue";
 import TableToolbar from "~/components/ui/TableToolbar.vue";
 import { CrudMixin } from "~/mixins/CrudMixin";
 import { LocaleMixin } from "~/mixins/LocaleMixin";
+import { debounce } from "~/constants/debounce";
 export default {
   components: {
     DeleteDialog,
@@ -78,6 +82,9 @@ export default {
       module: "apps",
       itemType: "App",
       selectedServer: null,
+      currentPage: null,
+      pageSize: null,
+      debouncedLoadApps: null,
     };
   },
   computed: {
@@ -86,6 +93,9 @@ export default {
     },
     apps() {
       return this.$store.getters["modules/apps/apps"];
+    },
+    totalApps() {
+      return this.$store.getters["modules/apps/totalApps"];
     },
     filteredApps() {
       return this.apps.filter((app) => {
@@ -98,6 +108,45 @@ export default {
         return serverMatch && nameMatch;
       });
     },
+  },
+  methods: {
+    handlePageChange(options) {
+      this.currentPage = options.page;
+      this.pageSize = options.itemsPerPage;
+      this.sortBy = options.sortBy.length
+        ? capitalizeFirstLetter(options.sortBy[0])
+        : "";
+      this.sortDesc = options.sortDesc[0];
+      this.loadApps();
+    },
+    async loadApps() {
+      this.isLoading = true;
+      await this.$store.dispatch("modules/apps/loadApps", {
+        page: this.currentPage,
+        pageSize: this.pageSize,
+        sortBy: this.sortBy,
+        sortDesc: this.sortDesc,
+        ...(this.selectedServer ? { serverId: this.selectedServer } : {}),
+        ...(this.search ? { search: this.search } : {}),
+      });
+      this.isLoading = false;
+    },
+  },
+  watch: {
+    selectedServer() {
+      this.currentPage = 1;
+      this.loadApps();
+    },
+    search() {
+      if (!this.search) this.search = "";
+      this.currentPage = 1;
+      this.debouncedLoadApps();
+    },
+  },
+  async created() {
+    this.debouncedLoadApps = debounce(this.loadApps, 500);
+    await this.loadAllServers();
+    await this.loadAllTasks();
   },
 };
 </script>

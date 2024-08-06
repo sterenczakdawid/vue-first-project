@@ -40,8 +40,14 @@ export default {
     const res = await axios.put("https://localhost:7233/api/Server", item);
     context.commit("updateServer", { index, item });
   },
-  async loadServers(context) {
-    const response = await axios.get("https://localhost:7233/api/Server");
+  async loadServers(context, params) {
+    const response = await axios.get("https://localhost:7233/api/Server", {
+      params,
+    });
     context.commit("setServers", response.data);
+    context.commit(
+      "setTotalServers",
+      parseInt(response.headers["x-total-count"])
+    );
   },
 };

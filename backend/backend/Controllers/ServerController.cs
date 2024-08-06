@@ -19,9 +19,42 @@ namespace backend.Controllers
 
     [EnableCors("AllowAllOrigins")]
     [HttpGet]
-    public async Task<ActionResult<List<Server>>> GetAllServers()
+    public async Task<ActionResult<List<Server>>> GetAllServers(int page = 1, int pageSize = 5, string search = "", string sortBy = "", bool? sortDesc = false)
     {
-      var servers = await _context.Servers.ToListAsync();
+      var query = _context.Servers.AsQueryable();
+
+
+      if (!string.IsNullOrEmpty(search))
+      {
+        query = query.Where(t => t.Name.Contains(search));
+      }
+
+      // Sortowanie
+      if (!string.IsNullOrEmpty(sortBy))
+      {
+        if (sortDesc.GetValueOrDefault())
+        {
+          query = query.OrderByDescending(e => EF.Property<object>(e, sortBy));
+        }
+        else
+        {
+          query = query.OrderBy(e => EF.Property<object>(e, sortBy));
+        }
+      }
+
+      var totalServers = await query.CountAsync();
+      List<Server> servers;
+      if (pageSize <= 0)
+      {
+        servers = await query.ToListAsync();
+      }
+      else
+      {
+        servers = await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
+      }
+
+      // Dodawanie nagłówka z całkowitą liczbą zadań
+      Response.Headers.Add("X-Total-Count", totalServers.ToString());
 
       return Ok(servers);
     }

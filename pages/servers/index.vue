@@ -3,10 +3,13 @@
     <v-data-table
       :headers="headers"
       :items="filteredServers"
-      :items-per-page="5"
+      :server-items-length="totalServers"
+      :items-per-page="pageSize"
       :search="search"
       :footer-props="footer"
       @click:row="handleClick"
+      @update:options="handlePageChange"
+      :loading="isLoading"
     >
       <template v-slot:top>
         <table-toolbar
@@ -50,6 +53,7 @@ import TableToolbar from "~/components/ui/TableToolbar.vue";
 
 import { CrudMixin } from "~/mixins/CrudMixin";
 import { LocaleMixin } from "~/mixins/LocaleMixin";
+import { debounce } from "~/constants/debounce";
 export default {
   components: {
     DeleteDialog,
@@ -62,6 +66,10 @@ export default {
     return {
       module: "servers",
       itemType: "Server",
+      currentPage: null,
+      pageSize: null,
+      sortBy: "",
+      sortDesc: false,
     };
   },
   computed: {
@@ -71,6 +79,43 @@ export default {
         server.name.toLowerCase().includes(searchLower)
       );
     },
+    totalServers() {
+      return this.$store.getters["modules/servers/totalServers"];
+    },
+  },
+  methods: {
+    handlePageChange(options) {
+      this.currentPage = options.page;
+      this.pageSize = options.itemsPerPage;
+      this.sortBy = options.sortBy.length
+        ? capitalizeFirstLetter(options.sortBy[0])
+        : "";
+      this.sortDesc = options.sortDesc[0];
+      this.loadServers();
+    },
+    async loadServers() {
+      this.isLoading = true;
+      const res = await this.$store.dispatch("modules/servers/loadServers", {
+        page: this.currentPage,
+        pageSize: this.pageSize,
+        sortBy: this.sortBy,
+        sortDesc: this.sortDesc,
+        ...(this.selectedServer ? { serverId: this.selectedServer } : {}),
+        ...(this.selectedApp ? { appId: this.selectedApp } : {}),
+        ...(this.search ? { search: this.search } : {}),
+      });
+      this.isLoading = false;
+    },
+  },
+  watch: {
+    search() {
+      if (!this.search) this.search = "";
+      this.currentPage = 1;
+      this.debouncedLoadServers();
+    },
+  },
+  async created() {
+    this.debouncedLoadServers = debounce(this.loadServers, 500);
   },
 };
 </script>

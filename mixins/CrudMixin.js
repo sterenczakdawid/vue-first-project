@@ -20,6 +20,7 @@ export const CrudMixin = {
         tasksIds: [],
         appsIds: [],
       },
+      isLoading: true,
     };
   },
   computed: {
@@ -33,7 +34,6 @@ export const CrudMixin = {
   methods: {
     handleClick(item) {
       this.$router.push(this.$route.path + "/" + item.id);
-      console.log(item);
     },
     editItem(item) {
       this.mode = "edit";
@@ -83,6 +83,7 @@ export const CrudMixin = {
       });
     },
     submit(formData) {
+      this.isLoading = true;
       const data = {
         ...formData,
         edited: new Date().toLocaleString().slice(0, -3),
@@ -102,19 +103,41 @@ export const CrudMixin = {
         );
       }
       this.dialog = false;
+      this.isLoading = false;
     },
-    loadItems() {
-      // console.log("loadItems w crud mixin wywolane");
-      this.$store.dispatch("modules/apps/loadApps");
-      // this.$store.dispatch("modules/tasks/loadTasks", {
-      //   page: this.page,
-      //   pageSize: this.pageSize,
-      // });
-      // this.$store.dispatch("modules/tasks/loadTasks");
-      this.$store.dispatch("modules/servers/loadServers");
+    async loadAllServers() {
+      this.isLoading = true;
+      await this.$store.dispatch("modules/servers/loadServers", {
+        pageSize: -1,
+      });
+      this.isLoading = false;
     },
-  },
-  created() {
-    this.loadItems();
+    async loadAllApps() {
+      this.isLoading = true;
+      await this.$store.dispatch("modules/apps/loadApps", {
+        pageSize: -1,
+      });
+      this.isLoading = false;
+    },
+    async loadAllTasks() {
+      this.isLoading = true;
+      await this.$store.dispatch("modules/tasks/loadTasks", {
+        pageSize: -1,
+      });
+      this.isLoading = false;
+    },
+    async loadItems() {
+      this.isLoading = true;
+      await this.$store.dispatch("modules/servers/loadServers", {
+        pageSize: -1,
+      });
+      await this.$store.dispatch("modules/apps/loadApps", {
+        pageSize: -1,
+      });
+      await this.$store.dispatch("modules/tasks/loadTasks", {
+        pageSize: -1,
+      });
+      this.isLoading = false;
+    },
   },
 };

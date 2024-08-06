@@ -91,26 +91,9 @@ export default {
       return this.selectedTask ? this.selectedTask.appId : null;
     },
     appName() {
-      if (this.appId != 0 && this.appId !== null) {
-        const app = this.apps.find((app) => app.id == this.appId);
-        return app ? app.name : "";
-      }
-      return "";
+      const app = this.apps.find((app) => app.id == this.appId);
+      return app ? app.name : "";
     },
-  },
-  created() {
-    this.loadTasks();
-    // console.log(this.$route.params);
-    // this.$store.dispatch("modules/tasks/loadTasks");
-    // console.log(this.$store.getters["modules/tasks/tasks"]);
-    // // const tasks = this.loadTasks();
-    // // this.selectedTask = this.$store.getters["modules/tasks/tasks"].find(
-    // //   (task) => task.id == this.id
-    // // );
-    // this.selectedTask = this.$store.getters["modules/tasks/tasks"].find(
-    //   (task) => task.id == this.$route.params.id
-    // );
-    console.log("created", this.selectedTask);
   },
   methods: {
     editItem() {
@@ -118,8 +101,6 @@ export default {
       this.dialogEdit = true;
     },
     deleteItem() {
-      console.log(this.servers);
-      console.log(this.selectedTask);
       this.dialogDelete = true;
     },
     deleteItemConfirm() {
@@ -137,10 +118,10 @@ export default {
     submit(formData) {
       const data = {
         ...formData,
-        edited: new Date().toLocaleString(),
+        edited: new Date().toLocaleString().slice(0, -3),
       };
       if (!formData.created) {
-        data.created = new Date().toLocaleString();
+        data.created = new Date().toLocaleString().slice(0, -3);
       }
       if (this.id > -1) {
         this.$store.dispatch("modules/tasks/updateTask", {
@@ -153,17 +134,23 @@ export default {
       this.selectedTask = { ...data };
       this.dialogEdit = false;
     },
-    // loadTasks() {
-    //   this.$store.dispatch("modules/servers/loadServers");
-    //   this.$store.dispatch("modules/tasks/loadTasks");
-    // },
     async loadTasks() {
       this.isLoading = true;
-      await this.$store.dispatch("modules/servers/loadServers");
-      await this.$store.dispatch("modules/tasks/loadTasks");
+      await this.$store.dispatch("modules/servers/loadServers", {
+        pageSize: -1,
+      });
+      await this.$store.dispatch("modules/apps/loadApps", {
+        pageSize: -1,
+      });
+      await this.$store.dispatch("modules/tasks/loadTasks", {
+        pageSize: -1,
+      });
       this.selectedTask = this.tasks.find((task) => task.id == this.id);
       this.isLoading = false;
     },
+  },
+  created() {
+    this.loadTasks();
   },
   watch: {
     "$route.params.id": {

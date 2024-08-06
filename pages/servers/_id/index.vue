@@ -1,8 +1,11 @@
 <template>
-  <div>
+  <div v-if="isLoading">
+    <v-progress-circular indeterminate></v-progress-circular>
+  </div>
+  <div v-else>
     <item-details
       :itemType="'Server'"
-      :item="this.selectedServer"
+      :item="selectedServer"
       @editItem="editItem"
       @deleteItem="deleteItem"
     ></item-details>
@@ -45,7 +48,7 @@
       :itemType="'server'"
       ><ServerForm
         ref="serverForm"
-        :initialData="this.selectedServer"
+        :initialData="selectedServer"
         @close="closeDialog('edit')"
         @submit="submit"
     /></server-form-dialog>
@@ -78,11 +81,21 @@ export default {
       tab: null,
       selectedServer: null,
       id: this.$route.params.id,
+      isLoading: true,
     };
   },
   computed: {
+    servers() {
+      return this.$store.getters["modules/servers/servers"];
+    },
+    tasks() {
+      return this.$store.getters["modules/tasks/tasks"];
+    },
+    apps() {
+      return this.$store.getters["modules/apps/apps"];
+    },
     name() {
-      return this.selectedServer.name;
+      return this.selectedServer ? this.selectedServer.name : "";
     },
     created() {
       return this.selectedServer.created;
@@ -90,24 +103,15 @@ export default {
     edited() {
       return this.selectedServer.edited;
     },
-    tasks() {
-      return this.$store.getters["modules/tasks/tasks"];
-    },
     filteredTasks() {
       if (!this.selectedServer) return [];
       return this.tasks.filter(
         (task) => task.serverId === this.selectedServer.id
       );
     },
-    apps() {
-      return this.$store.getters["modules/apps/apps"];
-    },
     filteredApps() {
       if (!this.selectedServer) return [];
       return this.apps.filter((app) => app.serverId === this.selectedServer.id);
-    },
-    servers() {
-      return this.$store.getters["modules/servers/servers"];
     },
   },
   methods: {
@@ -155,17 +159,40 @@ export default {
         this.dialogDelete = false;
       }
     },
-    loadTasks() {
-      this.$store.dispatch("modules/servers/loadServers");
-      this.$store.dispatch("modules/tasks/loadTasks");
-      // this.$store.dispatch("modules/apps/loadApps");
+    async loadServers() {
+      this.isLoading = true;
+      await this.$store.dispatch("modules/apps/loadApps", {
+        pageSize: -1,
+      });
+      await this.$store.dispatch("modules/servers/loadServers", {
+        pageSize: -1,
+      });
+      await this.$store.dispatch("modules/tasks/loadTasks", {
+        pageSize: -1,
+      });
+      this.selectedServer = this.servers.find((server) => server.id == this.id);
+      this.isLoading = false;
     },
   },
-  async created() {
-    this.loadTasks();
-    this.selectedServer = this.$store.getters["modules/servers/servers"].find(
-      (server) => server.id == this.id
-    );
+  created() {
+    this.loadServers();
+  },
+  watch: {
+    "$route.params.id": {
+      immediate: true,
+      handler(newId) {
+        this.id = newId;
+        this.loadServers();
+      },
+    },
+    servers: {
+      immediate: true,
+      handler() {
+        this.selectedServer = this.servers.find(
+          (server) => server.id == this.id
+        );
+      },
+    },
   },
 };
 </script>

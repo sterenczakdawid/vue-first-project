@@ -12,12 +12,11 @@ export default {
     const res = await axios.post("https://localhost:7233/api/Task", taskData);
     const newTaskId = res.data[res.data.length - 1].id;
     context.commit("addTask", { ...taskData, id: newTaskId });
+    await context.dispatch("loadTasks");
   },
   async updateTask(context, taskData) {
     const { index, item } = taskData;
-    console.log(item);
     const res = await axios.put("https://localhost:7233/api/Task", item);
-    // await context.dispatch("loadTasks");
     context.commit("updateTask", { index, item });
   },
   async removeTask(context, taskId) {
@@ -25,6 +24,7 @@ export default {
       params: { id: parseInt(taskId) },
     });
     context.commit("removeTask", parseInt(taskId));
+    await context.dispatch("loadTasks");
   },
 
   removeServerTasks(context, serverId) {
@@ -36,27 +36,7 @@ export default {
   attachTasksToApp(context, app) {
     context.commit("attachTasksToApp", app);
   },
-  // async loadTasks(context) {
-  //   const response = await axios.get("https://localhost:7233/api/Task");
-  //   console.log("tasks loaded", response);
-  //   context.commit("setTasks", response.data);
-  // },
-  // async loadTasks(context, { page = 1, pageSize = 10 } = {}) {
-  //   // console.log(`actions parameters: page: ${page}, pageSize: ${pageSize}`);
-  //   const response = await axios.get("https://localhost:7233/api/Task", {
-  //     params: { page, pageSize },
-  //   });
-  //   // console.log("actions response: ", response.data);
-  //   context.commit("setTasks", response.data);
-  //   context.commit(
-  //     "setTotalTasks",
-  //     parseInt(response.headers["x-total-count"])
-  //   );
-  //   // console.log("Pobrano taski: ", response);
-  //   // console.log("Total: ", parseInt(response.headers["x-total-count"]));
-  // },
   async loadTasks(context, params) {
-    // console.log("load tasks w store wywolane");
     const response = await axios.get("https://localhost:7233/api/Task", {
       params,
     });
