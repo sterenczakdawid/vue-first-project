@@ -1,5 +1,7 @@
 using backend.Data;
 using backend.Entities;
+using ClosedXML.Excel;
+using DocumentFormat.OpenXml.Office2021.DocumentTasks;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -160,6 +162,42 @@ namespace backend.Controllers
       await _context.SaveChangesAsync();
 
       return Ok(await _context.Apps.ToListAsync());
+    }
+
+    [EnableCors("AllowAllOrigins")]
+    [HttpGet("export")]
+    public async Task<IActionResult> ExportServersToExcel()
+    {
+      var apps = await _context.Apps.ToListAsync();
+
+      using (var workbook = new XLWorkbook())
+      {
+        var worksheet = workbook.Worksheets.Add("Apps");
+        var currentRow = 1;
+        worksheet.Cell(currentRow, 1).Value = "Id";
+        worksheet.Cell(currentRow, 2).Value = "Name";
+        worksheet.Cell(currentRow, 3).Value = "Created";
+        worksheet.Cell(currentRow, 4).Value = "Edited";
+        worksheet.Cell(currentRow, 5).Value = "ServerId";
+
+        foreach (var app in apps)
+        {
+          currentRow++;
+          worksheet.Cell(currentRow, 1).Value = app.Id;
+          worksheet.Cell(currentRow, 2).Value = app.Name;
+          worksheet.Cell(currentRow, 3).Value = app.Created;
+          worksheet.Cell(currentRow, 4).Value = app.Edited;
+          worksheet.Cell(currentRow, 5).Value = app.ServerId;
+        }
+
+        using (var stream = new MemoryStream())
+        {
+          workbook.SaveAs(stream);
+          var content = stream.ToArray();
+
+          return File(content, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "apps.xlsx");
+        }
+      }
     }
   }
 }

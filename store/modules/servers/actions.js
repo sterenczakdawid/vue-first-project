@@ -59,4 +59,25 @@ export default {
       parseInt(response.headers["x-total-count"])
     );
   },
+  async exportToExcel({ commit }, params) {
+    try {
+      const response = await axios.get(
+        "https://localhost:7233/api/Server/export",
+        {
+          params,
+          responseType: "blob", // Ensure the response is a blob
+        }
+      );
+
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", "Servers.xlsx"); // or whatever you want the file name to be
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      alert("Failed to download Excel file", error);
+    }
+  },
 };

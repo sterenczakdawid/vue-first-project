@@ -45,6 +45,9 @@
         </v-icon>
       </template>
     </v-data-table>
+    <v-btn @click="downloadExcel" color="success" outlined class="excel">
+      Excel
+    </v-btn>
   </div>
 </template>
 
@@ -108,6 +111,9 @@ export default {
         ...(this.search ? { search: this.search } : {}),
       });
       this.isLoading = false;
+    },
+    async downloadExcel() {
+      await this.$store.dispatch("modules/servers/exportToExcel");
     },
   },
   watch: {

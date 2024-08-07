@@ -71,6 +71,9 @@
         </v-icon>
       </template>
     </v-data-table>
+    <v-btn @click="downloadExcel" color="success" outlined class="excel">
+      Excel
+    </v-btn>
   </div>
 </template>
 
@@ -82,6 +85,7 @@ import TableToolbar from "~/components/ui/TableToolbar.vue";
 import { LocaleMixin } from "~/mixins/LocaleMixin";
 import { CrudMixin } from "~/mixins/CrudMixin";
 import { debounce, capitalizeFirstLetter } from "~/constants/debounce";
+import { axios } from "axios";
 export default {
   components: {
     DeleteDialog,
@@ -158,6 +162,9 @@ export default {
       });
       this.isLoading = false;
     },
+    async downloadExcel() {
+      await this.$store.dispatch("modules/tasks/exportToExcel");
+    },
   },
   watch: {
     selectedServer() {
@@ -188,5 +195,8 @@ tr :hover {
 }
 .lol {
   max-width: 230px;
+}
+.excel {
+  margin-top: 20px;
 }
 </style>

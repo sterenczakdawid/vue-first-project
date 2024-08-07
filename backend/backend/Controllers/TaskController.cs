@@ -1,5 +1,6 @@
 using backend.Data;
 using backend.Entities;
+using ClosedXML.Excel;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -18,19 +19,6 @@ namespace backend.Controllers
     {
       _context = context;
     }
-
-    //[EnableCors("AllowAllOrigins")]
-    //[HttpGet]
-    //public async Task<ActionResult<List<MyTask>>> GetAllTasks(int page = 1, int pageSize = 10)
-    //{
-    //  //var tasks = await _context.Tasks.ToListAsync();
-    //  var tasks = await _context.Tasks.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
-    //  var totalTasks = await _context.Tasks.CountAsync();
-
-    //  Response.Headers.Add("X-Total-Count", totalTasks.ToString());
-
-    //  return Ok(tasks);
-    //}
 
     [EnableCors("AllowAllOrigins")]
     [HttpGet]
@@ -174,5 +162,77 @@ namespace backend.Controllers
 
       return Ok(await _context.Tasks.ToListAsync());
     }
+
+    [EnableCors("AllowAllOrigins")]
+    [HttpGet("export")]
+    //GetAllTasks(int page = 1, int pageSize = 5, int? serverId = null, int? appId = null, string search = "", string sortBy = "", bool? sortDesc = false)
+    public async Task<IActionResult> ExportTasksToExcel() 
+    //public async Task<IActionResult> ExportTasksToExcel(int? serverId = null, int? appId = null, string search = "", string sortBy = "", bool? sortDesc = false)
+    {
+      var query = _context.Tasks.AsQueryable();
+
+      //if (serverId.HasValue)
+      //{
+      //  query = query.Where(t => t.ServerId == serverId);
+      //}
+
+      //if (appId.HasValue)
+      //{
+      //  query = query.Where(t => t.AppId == appId);
+      //}
+
+      //if (!string.IsNullOrEmpty(search))
+      //{
+      //  query = query.Where(t => t.Name.Contains(search));
+      //}
+
+      //if (!string.IsNullOrEmpty(sortBy))
+      //{
+      //  if (sortDesc.GetValueOrDefault())
+      //  {
+      //    query = query.OrderByDescending(e => EF.Property<object>(e, sortBy));
+      //  }
+      //  else
+      //  {
+      //    query = query.OrderBy(e => EF.Property<object>(e, sortBy));
+      //  }
+      //}
+
+      var tasks = await query.ToListAsync();
+      tasks = await _context.Tasks.ToListAsync();
+
+      using (var workbook = new XLWorkbook())
+      {
+        var worksheet = workbook.Worksheets.Add("Tasks");
+        var currentRow = 1;
+        worksheet.Cell(currentRow, 1).Value = "Id";
+        worksheet.Cell(currentRow, 2).Value = "Name";
+        worksheet.Cell(currentRow, 3).Value = "Created";
+        worksheet.Cell(currentRow, 4).Value = "Edited";
+        worksheet.Cell(currentRow, 5).Value = "ServerId";
+        worksheet.Cell(currentRow, 6).Value = "AppId";
+
+        foreach (var task in tasks)
+        {
+          currentRow++;
+          worksheet.Cell(currentRow, 1).Value = task.Id;
+          worksheet.Cell(currentRow, 2).Value = task.Name;
+          worksheet.Cell(currentRow, 3).Value = task.Created;
+          worksheet.Cell(currentRow, 4).Value = task.Edited;
+          worksheet.Cell(currentRow, 5).Value = task.ServerId;
+          worksheet.Cell(currentRow, 6).Value = task.AppId;
+        }
+
+        using (var stream = new MemoryStream())
+        {
+          workbook.SaveAs(stream);
+          var content = stream.ToArray();
+
+          return File(content, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "tasks.xlsx");
+        }
+      }
+    }
   }
+
+
 }

@@ -1,5 +1,6 @@
 using backend.Data;
 using backend.Entities;
+using ClosedXML.Excel;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -124,6 +125,40 @@ namespace backend.Controllers
       await _context.SaveChangesAsync();
 
       return Ok(await _context.Servers.ToListAsync());
+    }
+
+    [EnableCors("AllowAllOrigins")]
+    [HttpGet("export")]
+    public async Task<IActionResult> ExportServersToExcel()
+    {
+      var servers = await _context.Servers.ToListAsync();
+
+      using (var workbook = new XLWorkbook())
+      {
+        var worksheet = workbook.Worksheets.Add("Servers");
+        var currentRow = 1;
+        worksheet.Cell(currentRow, 1).Value = "Id";
+        worksheet.Cell(currentRow, 2).Value = "Name";
+        worksheet.Cell(currentRow, 3).Value = "Created";
+        worksheet.Cell(currentRow, 4).Value = "Edited";
+
+        foreach (var server in servers)
+        {
+          currentRow++;
+          worksheet.Cell(currentRow, 1).Value = server.Id;
+          worksheet.Cell(currentRow, 2).Value = server.Name;
+          worksheet.Cell(currentRow, 3).Value = server.Created;
+          worksheet.Cell(currentRow, 4).Value = server.Edited;
+        }
+
+        using (var stream = new MemoryStream())
+        {
+          workbook.SaveAs(stream);
+          var content = stream.ToArray();
+
+          return File(content, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "servers.xlsx");
+        }
+      }
     }
   }
 }
