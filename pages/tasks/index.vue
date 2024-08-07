@@ -1,5 +1,8 @@
 <template>
   <div class="container">
+    <v-snackbar v-model="snackbar" :color="snackbarColor" top elevation="24">
+      {{ snackbarMessage }}
+    </v-snackbar>
     <v-data-table
       :headers="headers"
       :items="filteredTasks"
@@ -144,7 +147,7 @@ export default {
     },
     async loadTasks() {
       this.isLoading = true;
-      const res = await this.$store.dispatch("modules/tasks/loadTasks", {
+      await this.$store.dispatch("modules/tasks/loadTasks", {
         page: this.currentPage,
         pageSize: this.pageSize,
         sortBy: this.sortBy,

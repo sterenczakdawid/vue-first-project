@@ -1,5 +1,8 @@
 <template>
   <div class="container">
+    <v-snackbar v-model="snackbar" :color="snackbarColor" top elevation="24">
+      {{ snackbarMessage }}
+    </v-snackbar>
     <v-data-table
       :headers="headers"
       :items="filteredServers"
@@ -95,7 +98,7 @@ export default {
     },
     async loadServers() {
       this.isLoading = true;
-      const res = await this.$store.dispatch("modules/servers/loadServers", {
+      await this.$store.dispatch("modules/servers/loadServers", {
         page: this.currentPage,
         pageSize: this.pageSize,
         sortBy: this.sortBy,

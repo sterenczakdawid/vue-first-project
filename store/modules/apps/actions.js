@@ -19,6 +19,7 @@ export default {
       { id: newAppId, tasksIds: app.tasksIds },
       { root: true }
     );
+    await context.dispatch("loadApps");
   },
   async updateApp(context, appData) {
     const { index, item } = appData;
@@ -33,6 +34,7 @@ export default {
       params: { id: parseInt(appId) },
     });
     context.commit("removeApp", parseInt(appId));
+    await context.dispatch("loadApps");
   },
   removeServerApps(context, serverId) {
     context.commit("removeServerApps", serverId);

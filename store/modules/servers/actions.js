@@ -16,6 +16,7 @@ export default {
       ...serverData,
       id: res.data[res.data.length - 1].id,
     });
+    await context.dispatch("loadServers");
   },
   async removeServer(context, serverId) {
     const res = await axios.delete(
@@ -34,6 +35,7 @@ export default {
       root: true,
     });
     context.commit("removeServer", parseInt(serverId));
+    await context.dispatch("loadServers");
   },
   async updateServer(context, serverData) {
     const { index, item } = serverData;

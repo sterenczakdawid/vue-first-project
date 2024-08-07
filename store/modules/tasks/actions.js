@@ -9,22 +9,34 @@ export default {
       serverId: task.serverId,
       appId: task.appId,
     };
-    const res = await axios.post("https://localhost:7233/api/Task", taskData);
-    const newTaskId = res.data[res.data.length - 1].id;
-    context.commit("addTask", { ...taskData, id: newTaskId });
-    await context.dispatch("loadTasks");
+    try {
+      const res = await axios.post("https://localhost:7233/api/Task", taskData);
+      const newTaskId = res.data[res.data.length - 1].id;
+      context.commit("addTask", { ...taskData, id: newTaskId });
+      await context.dispatch("loadTasks");
+    } catch (error) {
+      throw new Error(error.response.data);
+    }
   },
   async updateTask(context, taskData) {
     const { index, item } = taskData;
-    const res = await axios.put("https://localhost:7233/api/Task", item);
-    context.commit("updateTask", { index, item });
+    try {
+      await axios.put("https://localhost:7233/api/Task", item);
+      context.commit("updateTask", { index, item });
+    } catch (error) {
+      throw new Error(error.response.data);
+    }
   },
   async removeTask(context, taskId) {
-    const res = await axios.delete("https://localhost:7233/api/Task", {
-      params: { id: parseInt(taskId) },
-    });
-    context.commit("removeTask", parseInt(taskId));
-    await context.dispatch("loadTasks");
+    try {
+      await axios.delete("https://localhost:7233/api/Task", {
+        params: { id: parseInt(taskId) },
+      });
+      context.commit("removeTask", parseInt(taskId));
+      await context.dispatch("loadTasks");
+    } catch (error) {
+      throw new Error(error.response.data);
+    }
   },
 
   removeServerTasks(context, serverId) {

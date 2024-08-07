@@ -3,6 +3,9 @@
     <v-progress-circular indeterminate></v-progress-circular>
   </div>
   <div v-else>
+    <v-snackbar v-model="snackbar" :color="snackbarColor" top elevation="24">
+      {{ snackbarMessage }}
+    </v-snackbar>
     <item-details
       :itemType="'Task'"
       :item="this.selectedTask"
@@ -65,6 +68,9 @@ export default {
       dialogEdit: false,
       dialogDelete: false,
       isLoading: true,
+      snackbar: false,
+      snackbarMessage: "",
+      snackbarColor: "error",
     };
   },
   computed: {
@@ -115,7 +121,7 @@ export default {
         this.dialogDelete = false;
       }
     },
-    submit(formData) {
+    async submit(formData) {
       const data = {
         ...formData,
         edited: new Date().toLocaleString().slice(0, -3),
@@ -123,16 +129,26 @@ export default {
       if (!formData.created) {
         data.created = new Date().toLocaleString().slice(0, -3);
       }
-      if (this.id > -1) {
-        this.$store.dispatch("modules/tasks/updateTask", {
-          index: this.tasks.indexOf(this.selectedTask),
-          item: data,
-        });
-      } else {
-        this.$store.dispatch("modules/tasks/addTask", data);
+      try {
+        if (this.id > -1) {
+          await this.$store.dispatch("modules/tasks/updateTask", {
+            index: this.tasks.indexOf(this.selectedTask),
+            item: data,
+          });
+        } else {
+          await this.$store.dispatch("modules/tasks/addTask", data);
+        }
+        this.selectedTask = { ...data };
+        this.dialogEdit = false;
+        this.snackbarColor = "success";
+        this.snackbarMessage = this.$t("snackbars.saveSuccess");
+        this.snackbar = true;
+      } catch (error) {
+        this.snackbarColor = "error";
+        this.snackbarMessage =
+          `${this.$t("snackbars.saveError")}: ` + error.message;
+        this.snackbar = true;
       }
-      this.selectedTask = { ...data };
-      this.dialogEdit = false;
     },
     async loadTasks() {
       this.isLoading = true;

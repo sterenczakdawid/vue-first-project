@@ -59,6 +59,12 @@ const pl = {
   itemsAllText: "Wszystkie",
   itemsPerPage: "Wiersze na stronę",
   of: "z",
+  snackbars: {
+    saveSuccess: "Pomyślnie zapisano",
+    saveError: "Wystąpił błąd przy zapisie",
+    deleteSuccess: "Pomyślnie usunięto",
+    deleteError: "Wystąpił błąd przy usuwaniu",
+  },
 };
 
 export default pl;

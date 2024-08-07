@@ -100,9 +100,11 @@ namespace backend.Controllers
     [HttpPost]
     public async Task<ActionResult<List<MyTask>>> AddTask(MyTask task)
     {
-      Console.WriteLine(task.Id);
-      Console.WriteLine(task.Name);
-      Console.WriteLine(task.AppId);
+      var existingTask = await _context.Tasks.FirstOrDefaultAsync(t => t.Name == task.Name);
+      if (existingTask != null)
+      {
+        return BadRequest("Task with the same name already exists");
+      }
       if (task.AppId is null)
       {
         task.AppId = 0;
@@ -122,6 +124,11 @@ namespace backend.Controllers
       if (dbTask is null)
       {
         return BadRequest("Task not found");
+      }
+      var existingTask = await _context.Tasks.FirstOrDefaultAsync(t => t.Name == updatedTask.Name);
+      if (existingTask != null)
+      {
+        return BadRequest("Task with the same name already exists");
       }
 
       dbTask.Name = updatedTask.Name;
@@ -149,6 +156,7 @@ namespace backend.Controllers
       {
         return BadRequest("Task not found");
       }
+      
 
       _context.Tasks.Remove(dbTask);
       await _context.SaveChangesAsync();

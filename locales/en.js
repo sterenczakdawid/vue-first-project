@@ -58,6 +58,12 @@ const en = {
   itemsAllText: "All",
   itemsPerPage: "Rows per page",
   of: "of",
+  snackbars: {
+    saveSuccess: "Item saved successfully",
+    saveError: "There was an error",
+    deleteSuccess: "Item removed successfully",
+    deleteError: "There was an error",
+  },
 };
 
 export default en;

@@ -1,5 +1,8 @@
 <template>
   <div class="container">
+    <v-snackbar v-model="snackbar" :color="snackbarColor" top elevation="24">
+      {{ snackbarMessage }}
+    </v-snackbar>
     <v-data-table
       :headers="headers"
       :items="filteredApps"

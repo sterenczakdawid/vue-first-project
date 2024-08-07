@@ -21,6 +21,9 @@ export const CrudMixin = {
         appsIds: [],
       },
       isLoading: true,
+      snackbar: false,
+      snackbarMessage: "",
+      snackbarColor: "error",
     };
   },
   computed: {
@@ -46,11 +49,21 @@ export const CrudMixin = {
       this.editedItem = Object.assign({}, item);
       this.dialogDelete = true;
     },
-    deleteItemConfirm() {
-      this.$store.dispatch(
-        `modules/${this.module}/remove${this.itemType}`,
-        this.editedIndex
-      );
+    async deleteItemConfirm() {
+      try {
+        this.$store.dispatch(
+          `modules/${this.module}/remove${this.itemType}`,
+          this.editedIndex
+        );
+        this.snackbarColor = "success";
+        this.snackbarMessage = this.$t("snackbars.deleteSuccess");
+        this.snackbar = true;
+      } catch (error) {
+        this.snackbarColor = "error";
+        this.snackbarMessage =
+          `${this.$t("snackbars.deleteError")}: ` + error.message;
+        this.snackbar = true;
+      }
       this.closeDelete();
     },
     openDialog(mode) {
@@ -82,7 +95,7 @@ export const CrudMixin = {
         this.editedIndex = -1;
       });
     },
-    submit(formData) {
+    async submit(formData) {
       this.isLoading = true;
       const data = {
         ...formData,
@@ -91,18 +104,31 @@ export const CrudMixin = {
       if (!formData.created) {
         data.created = new Date().toLocaleString().slice(0, -3);
       }
-      if (this.editedIndex > -1) {
-        this.$store.dispatch(`modules/${this.module}/update${this.itemType}`, {
-          index: this.editedIndex,
-          item: data,
-        });
-      } else {
-        this.$store.dispatch(
-          `modules/${this.module}/add${this.itemType}`,
-          data
-        );
+      try {
+        if (this.id > -1) {
+          await this.$store.dispatch(
+            `modules/${this.module}/update${this.itemType}`,
+            {
+              index: this.editedIndex,
+              item: data,
+            }
+          );
+        } else {
+          await this.$store.dispatch(
+            `modules/${this.module}/add${this.itemType}`,
+            data
+          );
+        }
+        this.dialog = false;
+        this.snackbarColor = "success";
+        this.snackbarMessage = this.$t("snackbars.saveSuccess");
+        this.snackbar = true;
+      } catch (error) {
+        this.snackbarColor = "error";
+        this.snackbarMessage =
+          `${this.$t("snackbars.saveError")}: ` + error.message;
+        this.snackbar = true;
       }
-      this.dialog = false;
       this.isLoading = false;
     },
     async loadAllServers() {
