@@ -29,15 +29,12 @@ export default {
   },
   computed: {
     apps() {
-      console.log("wywoluje getter app do store z serverform.vue");
       return this.$store.getters["modules/apps/apps"];
     },
     tasks() {
-      console.log("wywoluje getter taskow do store z serverform.vue");
       return this.$store.getters["modules/tasks/tasks"];
     },
     servers() {
-      console.log("wywoluje getter serverow do store z serverform.vue");
       return this.$store.getters["modules/servers/servers"];
     },
   },

@@ -6,7 +6,6 @@ export default {
     state.totalTasks = payload;
   },
   addTask(state, task) {
-    console.log("tasks push: ", task);
     state.tasks.push(task);
   },
   updateTask(state, { index, item }) {

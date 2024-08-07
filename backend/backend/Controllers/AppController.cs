@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 
 namespace backend.Controllers
 {
@@ -72,6 +73,11 @@ namespace backend.Controllers
         Edited = app.Edited,
         ServerId = app.ServerId
       };
+      var existingApp = await _context.Apps.FirstOrDefaultAsync(t => t.Name == app.Name);
+      if (existingApp != null)
+      {
+        return BadRequest("App with the same name already exists");
+      }
 
       _context.Apps.Add(newApp);
       await _context.SaveChangesAsync();
@@ -97,6 +103,11 @@ namespace backend.Controllers
       if (dbApp is null)
       {
         return BadRequest("Task not found");
+      }
+      var existingApp = await _context.Apps.FirstOrDefaultAsync(t => t.Name == updatedApp.Name);
+      if (existingApp != null)
+      {
+        return BadRequest("App with the same name already exists");
       }
 
       dbApp.Name = updatedApp.Name;

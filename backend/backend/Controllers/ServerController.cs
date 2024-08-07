@@ -76,6 +76,11 @@ namespace backend.Controllers
     [HttpPost]
     public async Task<ActionResult<List<Server>>> AddServer(Server server)
     {
+      var existingServer = await _context.Servers.FirstOrDefaultAsync(t => t.Name == server.Name);
+      if (existingServer != null)
+      {
+        return BadRequest("Server with the same name already exists");
+      }
       _context.Servers.Add(server);
       await _context.SaveChangesAsync();
 
@@ -90,6 +95,11 @@ namespace backend.Controllers
       if (dbServer is null)
       {
         return BadRequest("Server not found");
+      }
+      var existingServer = await _context.Servers.FirstOrDefaultAsync(t => t.Name == updatedServer.Name);
+      if (existingServer != null)
+      {
+        return BadRequest("Server with the same name already exists");
       }
 
       dbServer.Name = updatedServer.Name;

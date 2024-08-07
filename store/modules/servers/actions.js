@@ -7,40 +7,47 @@ export default {
       created: server.created,
       edited: server.edited,
     };
-    const res = await axios.post(
-      "https://localhost:7233/api/Server",
-      serverData
-    );
-    console.log(res.data[res.data.length - 1]);
-    context.commit("addServer", {
-      ...serverData,
-      id: res.data[res.data.length - 1].id,
-    });
-    await context.dispatch("loadServers");
+    try {
+      const res = await axios.post(
+        "https://localhost:7233/api/Server",
+        serverData
+      );
+      context.commit("addServer", {
+        ...serverData,
+        id: res.data[res.data.length - 1].id,
+      });
+      await context.dispatch("loadServers");
+    } catch (error) {
+      throw new Error(error.response.data);
+    }
   },
   async removeServer(context, serverId) {
-    const res = await axios.delete(
-      `https://localhost:7233/api/Task/server/${serverId}`
-    );
-    const res2 = await axios.delete("https://localhost:7233/api/Server", {
-      params: { id: parseInt(serverId) },
-    });
-    const res3 = await axios.delete(
-      `https://localhost:7233/api/App/server/${serverId}`
-    );
-    context.commit("modules/tasks/removeServerTasks", parseInt(serverId), {
-      root: true,
-    });
-    context.commit("modules/apps/removeServerApps", parseInt(serverId), {
-      root: true,
-    });
-    context.commit("removeServer", parseInt(serverId));
-    await context.dispatch("loadServers");
+    try {
+      await axios.delete(`https://localhost:7233/api/Task/server/${serverId}`);
+      await axios.delete("https://localhost:7233/api/Server", {
+        params: { id: parseInt(serverId) },
+      });
+      await axios.delete(`https://localhost:7233/api/App/server/${serverId}`);
+      context.commit("modules/tasks/removeServerTasks", parseInt(serverId), {
+        root: true,
+      });
+      context.commit("modules/apps/removeServerApps", parseInt(serverId), {
+        root: true,
+      });
+      context.commit("removeServer", parseInt(serverId));
+      await context.dispatch("loadServers");
+    } catch (error) {
+      throw new Error(error.response.data);
+    }
   },
   async updateServer(context, serverData) {
-    const { index, item } = serverData;
-    const res = await axios.put("https://localhost:7233/api/Server", item);
-    context.commit("updateServer", { index, item });
+    try {
+      const { index, item } = serverData;
+      await axios.put("https://localhost:7233/api/Server", item);
+      context.commit("updateServer", { index, item });
+    } catch (error) {
+      throw new Error(error.response.data);
+    }
   },
   async loadServers(context, params) {
     const response = await axios.get("https://localhost:7233/api/Server", {

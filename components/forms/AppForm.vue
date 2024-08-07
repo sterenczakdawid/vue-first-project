@@ -49,15 +49,12 @@ export default {
   },
   computed: {
     servers() {
-      console.log("wywoluje getter serverow do store z appform.vue");
       return this.$store.getters["modules/servers/servers"];
     },
     apps() {
-      console.log("wywoluje getter app do store z appform.vue");
       return this.$store.getters["modules/apps/apps"];
     },
     tasks() {
-      console.log("wywoluje getter taskow do store z appform.vue");
       return this.$store.getters["modules/tasks/tasks"];
     },
     tasksIds() {
