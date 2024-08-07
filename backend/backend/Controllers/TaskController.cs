@@ -113,7 +113,7 @@ namespace backend.Controllers
       {
         return BadRequest("Task not found");
       }
-      var existingTask = await _context.Tasks.FirstOrDefaultAsync(t => t.Name == updatedTask.Name);
+      var existingTask = await _context.Tasks.FirstOrDefaultAsync(t => t.Name == updatedTask.Name && t.Id != updatedTask.Id);
       if (existingTask != null)
       {
         return BadRequest("Task with the same name already exists");

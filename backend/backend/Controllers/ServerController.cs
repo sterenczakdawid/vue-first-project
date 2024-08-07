@@ -97,7 +97,8 @@ namespace backend.Controllers
       {
         return BadRequest("Server not found");
       }
-      var existingServer = await _context.Servers.FirstOrDefaultAsync(t => t.Name == updatedServer.Name);
+      var existingServer = await _context.Servers
+                                      .FirstOrDefaultAsync(t => t.Name == updatedServer.Name && t.Id != updatedServer.Id);
       if (existingServer != null)
       {
         return BadRequest("Server with the same name already exists");

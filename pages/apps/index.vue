@@ -167,4 +167,7 @@ tr :hover {
 .maxw {
   max-width: 300px;
 }
+.excel {
+  margin-top: 20px;
+}
 </style>

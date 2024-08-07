@@ -104,9 +104,9 @@ namespace backend.Controllers
       var dbApp = await _context.Apps.FindAsync(updatedApp.Id);
       if (dbApp is null)
       {
-        return BadRequest("Task not found");
+        return BadRequest("App not found");
       }
-      var existingApp = await _context.Apps.FirstOrDefaultAsync(t => t.Name == updatedApp.Name);
+      var existingApp = await _context.Apps.FirstOrDefaultAsync(t => t.Name == updatedApp.Name && t.Id != updatedApp.Id);
       if (existingApp != null)
       {
         return BadRequest("App with the same name already exists");
@@ -115,7 +115,6 @@ namespace backend.Controllers
       dbApp.Name = updatedApp.Name;
       dbApp.Edited = updatedApp.Edited;
       dbApp.ServerId = updatedApp.ServerId;
-      Console.WriteLine(updatedApp.tasksIds[0]);
 
       // Clear existing task associations
       var existingTasks = await _context.Tasks.Where(t => t.AppId == dbApp.Id).ToListAsync();

@@ -105,8 +105,8 @@ export const CrudMixin = {
         data.created = new Date().toLocaleString().slice(0, -3);
       }
       try {
-        if (this.id > -1) {
-          await this.$store.dispatch(
+        if (this.editedIndex > -1) {
+          this.$store.dispatch(
             `modules/${this.module}/update${this.itemType}`,
             {
               index: this.editedIndex,

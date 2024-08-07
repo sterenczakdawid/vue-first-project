@@ -133,4 +133,7 @@ export default {
 tr :hover {
   cursor: pointer;
 }
+.excel {
+  margin-top: 20px;
+}
 </style>
